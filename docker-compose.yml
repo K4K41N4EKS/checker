@@ -16,7 +16,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   api:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: checker_backend
     restart: always
     depends_on:
@@ -28,7 +30,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
+      - .:/app
     entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
 
 volumes:
