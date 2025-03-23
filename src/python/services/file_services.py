@@ -1,36 +1,94 @@
 import os
-from fastapi import UploadFile
-from src.python.database.database import SessionLocal
-from src.python.models.operation import Operation
+import shutil
+import uuid
+from datetime import datetime
+from fastapi import UploadFile, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
+from src.python.database.database import SessionLocal
+from src.python.models.operation import Operation, OperationStatus
 
+# Папка для хранения загруженных файлов
 UPLOAD_FOLDER = "uploaded_files"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-def save_file(file: UploadFile, user_id: int) -> tuple[str, int]:
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    with open(file_path, "wb") as f:
-        content = file.file.read()
-        f.write(content)
 
-    with SessionLocal() as db:
-        operation = Operation(file_name=file.filename, user_id=user_id, status="uploaded")
-        db.add(operation)
-        db.commit()
-        db.refresh(operation)
-        return file.filename, operation.id
+def save_file(file: UploadFile, user_id: int, db: Session, background_tasks: BackgroundTasks):
+    """
+    Сохраняет файл на диск и создает запись об операции в базе данных.
+    Запускает фоновую задачу обработки файла.
+    """
+    unique_name = f"{uuid.uuid4()}_{file.filename}"
+    file_path = os.path.join(UPLOAD_FOLDER, unique_name)
 
-def get_file_response(file_name: str) -> FileResponse:
-    file_path = os.path.join("uploaded_files", file_name)
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    operation = Operation(
+        file_name=unique_name,
+        user_id=user_id,
+        status=OperationStatus.uploaded,
+        created_at=datetime.utcnow(),
+    )
+
+    db.add(operation)
+    db.commit()
+    db.refresh(operation)
+
+    background_tasks.add_task(process_file_task, operation.id)
+
+    return unique_name, operation.id
+
+
+def process_file_task(operation_id: int):
+    """
+    Фоновая задача обработки файла — обновляет статус операции.
+    """
+    db = SessionLocal()
+    try:
+        operation = db.query(Operation).filter(Operation.id == operation_id).first()
+        if operation:
+            operation.status = OperationStatus.processing
+            db.commit()
+
+            import time
+            time.sleep(3)
+
+            operation.status = OperationStatus.done
+            db.commit()
+    except Exception:
+        if operation:
+            operation.status = OperationStatus.error
+            db.commit()
+    finally:
+        db.close()
+
+
+def get_file_response(operation_id: int, user_id: int, db: Session):
+    """
+    Возвращает файл, связанный с операцией по ID.
+    """
+    operation = db.query(Operation).filter_by(id=operation_id, user_id=user_id).first()
+    if not operation:
+        raise HTTPException(status_code=404, detail="Операция не найдена")
+
+    file_path = os.path.join(UPLOAD_FOLDER, operation.file_name)
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Файл {file_name} не найден")
-    return FileResponse(path=file_path, filename=file_name, media_type='application/octet-stream')
+        raise HTTPException(status_code=404, detail="Файл не найден")
 
-def get_operations_by_user(user_id: int) -> list[dict]:
-    with SessionLocal() as db:
-        operations = db.query(Operation).filter_by(user_id=user_id).all()
-        return [{
-            "id": op.id,
-            "file_name": op.file_name,
-            "status": op.status
-        } for op in operations]
+    return FileResponse(file_path, filename=operation.file_name)
+
+
+def get_operations_by_user(user_id: int, db: Session, status_filter=None, sort_by=None):
+    """
+    Возвращает список операций пользователя с возможностью фильтрации и сортировки.
+    """
+    query = db.query(Operation).filter(Operation.user_id == user_id)
+
+    if status_filter:
+        query = query.filter(Operation.status == status_filter)
+
+    if sort_by == "date":
+        query = query.order_by(Operation.created_at.desc())
+
+    return query.all()

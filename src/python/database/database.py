@@ -13,3 +13,10 @@ def init_db():
     from src.python.models.user import User
     from src.python.models.operation import Operation
     Base.metadata.create_all(bind=engine)
+    
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
