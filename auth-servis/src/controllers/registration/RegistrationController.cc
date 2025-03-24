@@ -5,6 +5,7 @@
 #include <jsoncpp/json/json.h>
 #include <pqxx/pqxx>
 #include <cstdlib>
+#include <cpr/cpr.h>
 
 
 
@@ -31,6 +32,7 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
 
     std::string username = headers["username"];
     std::string passwd = headers["passwd"];
+    std::string user_id = drogon::utils::getUuid();
 
     try{
 
@@ -43,7 +45,8 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         pqxx::work txn(conn);
 
         auto result = txn.exec(
-            "INSERT INTO users (username, password_hash) VALUES (" + 
+            "INSERT INTO users (user_id, username, password_hash) VALUES (" + 
+            txn.quote(user_id) + ", " +
             txn.quote(username) + ", " +
             txn.quote(drogon::utils::getSha256(passwd)) + ")"
         );
@@ -51,6 +54,24 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
             throw std::runtime_error("Unexpected result from INSERT query");
         }
         txn.commit();
+
+        
+        
+        cpr::Response resp = cpr::Post(
+            cpr::Url{"http://localhost:3000/create_user"},
+            cpr::Header{{"user_id", user_id}, {"username", username}}
+        );
+        if(resp.status_code != 200 || resp.status_code != 201){
+            
+            throw std::runtime_error(
+                std::string("Main servis return status code ") + 
+                std::string(resp.status_code) + 
+                std::string(". With message: ") + 
+                std::string(resp.text)
+            );
+        }
+
+
 
         Json::Value resp;
         resp["status"] = "success";

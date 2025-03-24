@@ -44,7 +44,6 @@ std::string authAndValid::IAuth::GenerateJwt(
         .set_subject(username)
         .set_type("JWS")
         .set_payload_claim(
-
             "username", jwt::claim(username)
         )
         .set_expires_at(
@@ -65,7 +64,6 @@ std::string authAndValid::IAuth::GenerateJwt(
 
     return token;
 }
-
 
 std::string authAndValid::IAuth::generateAndCommitAccessToken(const std::string &username){
     

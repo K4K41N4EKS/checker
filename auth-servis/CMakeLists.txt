@@ -8,6 +8,7 @@ set(SRC_FILES
     main.cc
     src/app/App.cc
     src/controllers/login/LoginController.cc
+    src/controllers/logout/LogoutController.cc
     src/controllers/registration/RegistrationController.cc
     src/controllers/updateaccess/UpdateAssessController.cc
     src/utils/auth.cc
@@ -21,6 +22,7 @@ aux_source_directory(controllers CTL_SRC_DIR)
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controllers/login
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/controllers/logout
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controllers/registration
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controllers/updateaccess
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils
