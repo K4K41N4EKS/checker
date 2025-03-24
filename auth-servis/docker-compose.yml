@@ -1,0 +1,30 @@
+services:
+  auth-servis:
+    image: dipsomask/nossl-auth-small
+    ports:
+      - "3000:3000"
+    networks:
+      - auth-servis-network
+    container_name: auth-servis
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pg-data:/var/lib/postgresql/data
+    ports:
+      - "65100:5432"
+    networks:
+      - auth-servis-network
+    container_name: postgres
+
+
+networks:
+  auth-servis-network:
+
+volumes:
+  pg-data:

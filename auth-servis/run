@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "cd to auth-servis build dir.." && \
+cd build
+
+echo "cmake .. && cmake --build . COMMANDS" && \
+cmake .. && cmake --build .
+
+echo "run auth-servis with files:"
+echo "    '/home/dipsomask/Документы/nounv_prog/auth-servis/config.example.nossl.json'"
+echo "    '/home/dipsomask/Документы/nounv_prog/auth-servis/servisCfg.json'"
+./auth-servis /home/dipsomask/Документы/nounv_prog/auth-servis/config.example.nossl.json /home/dipsomask/Документы/nounv_prog/auth-servis/servisCfg.json
