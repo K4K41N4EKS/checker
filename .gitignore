@@ -1,2 +1,25 @@
-.env
+
+# python cash dir
 __pycache__
+
+# not needed downloaded files
+uploaded_files
+
+#project enviromental config files
+.env
+auth-servis/config.json
+auth-servis/servisCfg.json
+auth-servis/exmpl-desctop-with-auth/example.config.json
+
+#cmake build dir
+auth-servis/build
+auth-servis/exmpl-desctop-with-auth/build
+
+#vscode dirs
+auth-servis/.vscode
+
+#external libs dirs if dont't need
+#External
+
+#docs (not corrected)
+auth-servis/docs
