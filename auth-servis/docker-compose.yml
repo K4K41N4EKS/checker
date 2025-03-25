@@ -2,7 +2,7 @@ services:
   auth-servis:
     image: dipsomask/nossl-auth-small
     ports:
-      - "3000:3000"
+      - "3333:3333"
     networks:
       - auth-servis-network
     container_name: auth-servis

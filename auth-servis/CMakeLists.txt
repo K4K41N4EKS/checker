@@ -5,8 +5,8 @@ project(auth-servis CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 
+link_directories(/usr/local/lib)
 
-find_package(cpr REQUIRED)
 
 
 set(SRC_FILES
@@ -25,6 +25,7 @@ aux_source_directory(controllers CTL_SRC_DIR)
 
 
 include_directories(
+    /usr/local/include
     ${CMAKE_CURRENT_SOURCE_DIR}/src/app
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controllers/login
     ${CMAKE_CURRENT_SOURCE_DIR}/src/controllers/logout
@@ -60,7 +61,7 @@ find_package(libpqxx REQUIRED)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE 
-    cpr::cpr
+    cpr
     Drogon::Drogon 
     libpqxx::pqxx
     ${PostgreSQL_LIBRARIES}
@@ -70,7 +71,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER DM)
 set(CPACK_GENERATOR "DEB")
-set(CPACK_PACKAGE_HOMEPAGE_URL https://github.com/dipsomask/auth-servis.git)
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 install(TARGETS ${PROJECT_NAME} DESTINATION /usr/bin)

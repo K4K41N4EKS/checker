@@ -63,6 +63,18 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         );
         if(resp.status_code != 200 || resp.status_code != 201){
             
+            pqxx::connection conn(servisCfg.getConnectionArgs());
+            pqxx::work txn(conn);
+
+            auto result = txn.exec(
+                "DELETE FROM users WHERE user_id = " + 
+                txn.quote(user_id) + ";"
+            );
+            if (!result.empty()) {
+                throw std::runtime_error("Unexpected result from DELETE query");
+            }
+            txn.commit();
+
             throw std::runtime_error(
                 std::string("Main servis return status code ") + 
                 std::to_string(resp.status_code) + 

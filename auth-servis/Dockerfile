@@ -36,10 +36,11 @@ RUN mkdir build
 WORKDIR $DROGON_PATH/build
 RUN cmake .. && make && make install
 
-COPY . .
-WORKDIR /usr/src/auth-servis
 
-CMD cd /usr/src/auth-servis && mkdir build && cd build && \
- ./run && /usr/src/auth-servis \
- /usr/src/auth-servis/config.example.nossl.json \
- /usr/src/auth-servis/servisCfg.example.json
+WORKDIR /usr/src/auth-servis-for-check-app
+COPY . .
+
+CMD cd /usr/src/auth-servis-for-check-app && mkdir build && cd build && \ 
+    cmake .. && cmake --build . && /usr/src/auth-servis-for-check-app \ 
+    /usr/src/auth-servis-for-check-app/config.example.nossl.json \ 
+    /usr/src/auth-servis-for-check-app/servisCfg.example.json
