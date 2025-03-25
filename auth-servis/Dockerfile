@@ -20,11 +20,11 @@ RUN apt-get update && apt-get install -y \
 
 
 # Установка библиотеки cpr
-WORKDIR /tmp
-RUN git clone https://github.com/libcpr/cpr.git
-WORKDIR /tmp/cpr
+ENV CPR_PATH=/opt/cpr
+RUN git clone https://github.com/libcpr/cpr.git ${CPR_PATH}
+WORKDIR $CPR_PATH
 RUN mkdir build
-WORKDIR /tmp/cpr/build
+WORKDIR $CPR_PATH/build
 RUN cmake .. && make && make install
 
 
@@ -37,10 +37,12 @@ WORKDIR $DROGON_PATH/build
 RUN cmake .. && make && make install
 
 
-WORKDIR /usr/src/auth-servis-for-check-app
+WORKDIR /usr/src/auth-servis
 COPY . .
 
-CMD cd /usr/src/auth-servis-for-check-app && mkdir build && cd build && \ 
-    cmake .. && cmake --build . && /usr/src/auth-servis-for-check-app \ 
-    /usr/src/auth-servis-for-check-app/config.example.nossl.json \ 
-    /usr/src/auth-servis-for-check-app/servisCfg.example.json
+CMD cd /usr/src/auth-servis && mkdir build && cd build && cmake .. && \
+cmake --build . && \
+/usr/src/auth-servis/build/auth-servis \ 
+/usr/src/auth-servis/config.example.nossl.json \ 
+/usr/src/auth-servis/servisCfg.example.json
+

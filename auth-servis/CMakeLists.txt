@@ -53,8 +53,6 @@ find_package(Drogon CONFIG REQUIRED)
 find_package(PostgreSQL REQUIRED)
 
 # Specify the path to libpqxx
-set(PQXX_DIR "/usr/local/lib/cmake/libpqxx")
-find_package(libpqxx REQUIRED)
 
 
 
@@ -63,7 +61,7 @@ find_package(libpqxx REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     cpr
     Drogon::Drogon 
-    libpqxx::pqxx
+    pqxx
     ${PostgreSQL_LIBRARIES}
 )
 

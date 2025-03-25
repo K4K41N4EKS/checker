@@ -1,11 +1,11 @@
 services:
-  auth-servis:
-    image: dipsomask/nossl-auth-small
+  auth-for-check-app:
+    image: dipsomask/auth-for-check-app:latest
     ports:
       - "3333:3333"
     networks:
-      - auth-servis-network
-    container_name: auth-servis
+      - auth-for-check-app-network
+    container_name: auth-for-check-app
 
   postgres:
     image: postgres:latest
@@ -19,12 +19,12 @@ services:
     ports:
       - "65100:5432"
     networks:
-      - auth-servis-network
+      - auth-for-check-app-network
     container_name: postgres
 
 
 networks:
-  auth-servis-network:
+  auth-for-check-app-network:
 
 volumes:
   pg-data:
