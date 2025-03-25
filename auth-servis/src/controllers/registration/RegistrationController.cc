@@ -65,19 +65,19 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
             
             throw std::runtime_error(
                 std::string("Main servis return status code ") + 
-                std::string(resp.status_code) + 
+                std::to_string(resp.status_code) + 
                 std::string(". With message: ") + 
-                std::string(resp.text)
+                resp.text
             );
         }
 
 
 
-        Json::Value resp;
-        resp["status"] = "success";
-        resp["message"] = "User registred successfully";
+        Json::Value ans;
+        ans["status"] = "success";
+        ans["message"] = "User registred successfully";
 
-        auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
+        auto response = drogon::HttpResponse::newHttpJsonResponse(ans);
         response->setStatusCode(drogon::HttpStatusCode::k200OK);
         
         callback(response);

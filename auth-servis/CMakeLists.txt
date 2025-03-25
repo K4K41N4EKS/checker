@@ -4,6 +4,11 @@ project(auth-servis CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
+
+
+find_package(cpr REQUIRED)
+
+
 set(SRC_FILES
     main.cc
     src/app/App.cc
@@ -50,8 +55,7 @@ find_package(PostgreSQL REQUIRED)
 set(PQXX_DIR "/usr/local/lib/cmake/libpqxx")
 find_package(libpqxx REQUIRED)
 
-set(cpr_DIR "/usr/local/lib/cmake/cpr")
-find_package(cpr REQUIRED)
+
 
 
 # Link libraries

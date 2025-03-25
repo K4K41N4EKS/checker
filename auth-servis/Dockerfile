@@ -18,6 +18,16 @@ RUN apt-get update && apt-get install -y \
     libmariadb3 \
     libyaml-cpp0.8 && rm -rf /var/lib/apt/lists/*
 
+
+# Установка библиотеки cpr
+WORKDIR /tmp
+RUN git clone https://github.com/libcpr/cpr.git
+WORKDIR /tmp/cpr
+RUN mkdir build
+WORKDIR /tmp/cpr/build
+RUN cmake .. && make && make install
+
+
 ENV DROGON_PATH=/opt/drogon
 RUN git clone https://github.com/drogonframework/drogon $DROGON_PATH
 WORKDIR $DROGON_PATH
@@ -26,11 +36,10 @@ RUN mkdir build
 WORKDIR $DROGON_PATH/build
 RUN cmake .. && make && make install
 
-WORKDIR /tmp
-RUN git clone https://github.com/dipsomask/auth-servis.git \
-    && mv /tmp/auth-servis/deb/auth-servis-0.1.1-Linux.deb /usr/src \
-    && mv /tmp/auth-servis/servisCfg.example.json /usr/src \
-    && mv /tmp/auth-servis/config.example.nossl.json /usr/src \
-    && rm -rf /tmp/auth-servis
+COPY . .
+WORKDIR /usr/src/auth-servis
 
-CMD cd /usr/src && dpkg -i auth-servis-0.1.1-Linux.deb && chmod +x /usr/bin/auth-servis && cd /usr/bin && /usr/bin/auth-servis /usr/src/config.example.nossl.json /usr/src/servisCfg.example.json
+CMD cd /usr/src/auth-servis && mkdir build && cd build && \
+ ./run && /usr/src/auth-servis \
+ /usr/src/auth-servis/config.example.nossl.json \
+ /usr/src/auth-servis/servisCfg.example.json

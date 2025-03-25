@@ -76,12 +76,8 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
 
         // завершение сессии польз. удалением рефреш и ацесс токенов из БД
-        pqxx::connection conn(servisCfg.getConnectionArgs());
-        pqxx::work txn(conn);
-
-        auto result = txn.exec(
-            "UPDATE users SET access_token = NULL, refresh_token = NULL " + 
-            "WHERE username = " + 
+        result = txn.exec(
+            "UPDATE users SET access_token = NULL, refresh_token = NULL WHERE username = " + 
             txn.quote(username) + " AND refresh_token = " +
             txn.quote(refresh_t) + ";"
         );
@@ -97,7 +93,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         resp["message"] = "User successfully logout";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
-        response->setStatusCode(drogon::HttpStatusCode::k201OK);
+        response->setStatusCode(drogon::HttpStatusCode::k201Created);
 
         callback(response);
 
