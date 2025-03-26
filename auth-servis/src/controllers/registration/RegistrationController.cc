@@ -61,7 +61,7 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
             cpr::Url{"http://checker_backend:3000/create_user"},
             cpr::Header{{"user_id", user_id}, {"username", username}}
         );
-        if(resp.status_code != 200 || resp.status_code != 201){
+        if(resp.status_code != 201){
             
             pqxx::connection conn(servisCfg.getConnectionArgs());
             pqxx::work txn(conn);
