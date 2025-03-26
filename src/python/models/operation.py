@@ -17,7 +17,7 @@ class Operation(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     file_name = Column(String, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
     status = Column(Enum(OperationStatus), default=OperationStatus.uploaded)
     created_at = Column(DateTime, default=datetime.utcnow)
 
