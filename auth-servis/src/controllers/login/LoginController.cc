@@ -30,6 +30,7 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
 
     std::string username = headers["username"];
     std::string passwd = headers["passwd"];
+    std::cout << "\n" << drogon::utils::getSha256(passwd) << "\n";
 
     try{
 

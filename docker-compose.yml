@@ -6,7 +6,7 @@ services:
     ports:
       - "3333:3333"
     networks:
-      - auth-for-check-app-network
+      - checker-network
     container_name: auth-for-check-app
     depends_on:
       - postgres-auth
@@ -28,7 +28,7 @@ services:
     ports:
       - "65100:5432"
     networks:
-      - auth-for-check-app-network
+      - checker-network
     container_name: postgres-auth
 
   db:
@@ -69,7 +69,6 @@ services:
       - checker-network
 
 networks:
-  auth-for-check-app-network:
   checker-network:
 
 volumes:
