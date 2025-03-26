@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from src.python.database.database import init_db
-from src.python.routers import file_router
+from python.database.database import init_db
+from python.routers import all_routers
 
 app = FastAPI()
 
-app.include_router(file_router.router, prefix="/file", tags=["file"])
+for router in all_routers:
+    app.include_router(router)
 
 @app.on_event("startup")
 def on_startup():
