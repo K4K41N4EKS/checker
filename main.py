@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from python.database.database import init_db
-from python.routers import all_routers
+from src.python.database.database import init_db
+from src.python.routers import all_routers
 
 app = FastAPI()
 
