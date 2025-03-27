@@ -36,6 +36,7 @@ configdb::ServisConfig::ServisConfig(const std::string& path){
     dbport = data["dbport"].asInt();
 
     secret = data["secret"].asString();
+    checker_secret = data["checker_secret"].asString();
 
     access_t_lifestyle_time_hours = data["access-t-lifestyle-time-hours"].asInt();
     access_t_lifestyle_time_minuts = data["access-t-lifestyle-time-minuts"].asInt();
@@ -60,6 +61,12 @@ std::string configdb::ServisConfig::getSecretKey(){
 
 }
 
+std::string configdb::ServisConfig::getCheckerAppSecret(){
+
+    return checker_secret;
+
+}
+
 int configdb::ServisConfig::getAccessTLifestyleTime_hours(){
     
     return access_t_lifestyle_time_hours;
@@ -67,13 +74,13 @@ int configdb::ServisConfig::getAccessTLifestyleTime_hours(){
 }
 
 int configdb::ServisConfig::getAccessTLifestyleTime_minuts(){
-    
+
     return access_t_lifestyle_time_minuts;
 
 }
 
 int configdb::ServisConfig::getRefreshTLifestyleTime_hours(){
-    
+
     return refresh_t_lifestyle_time_hours;
 
 }

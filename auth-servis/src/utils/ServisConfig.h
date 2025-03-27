@@ -17,6 +17,7 @@ namespace configdb {
             int dbport;
 
             std::string secret;
+            std::string checker_secret;
         
             int access_t_lifestyle_time_hours;
             int access_t_lifestyle_time_minuts;
@@ -29,6 +30,7 @@ namespace configdb {
 
             std::string getConnectionArgs();
             std::string getSecretKey();
+            std::string getCheckerAppSecret();
 
             int getAccessTLifestyleTime_hours();
             int getAccessTLifestyleTime_minuts();
