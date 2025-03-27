@@ -2,9 +2,11 @@ import os
 import shutil
 import uuid
 from datetime import datetime
+
 from fastapi import UploadFile, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+
 from src.python.database.database import SessionLocal
 from src.python.models.operation import Operation, OperationStatus
 
@@ -13,7 +15,7 @@ UPLOAD_FOLDER = "uploaded_files"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
-def save_file(file: UploadFile, user_id: int, db: Session, background_tasks: BackgroundTasks):
+def save_file(file: UploadFile, user_id: str, db: Session, background_tasks: BackgroundTasks):
     """
     Сохраняет файл на диск и создает запись об операции в базе данных.
     Запускает фоновую задачу обработки файла.
@@ -51,6 +53,7 @@ def process_file_task(operation_id: int):
             operation.status = OperationStatus.processing
             db.commit()
 
+            # Здесь можно вставить реальную логику обработки файла
             import time
             time.sleep(3)
 
@@ -64,13 +67,16 @@ def process_file_task(operation_id: int):
         db.close()
 
 
-def get_file_response(operation_id: int, user_id: int, db: Session):
+def get_file_response(operation_id: int, user_id: str, db: Session):
     """
-    Возвращает файл, связанный с операцией по ID.
+    Возвращает файл, связанный с операцией по ID, если пользователь — владелец.
     """
-    operation = db.query(Operation).filter_by(id=operation_id, user_id=user_id).first()
+    operation = db.query(Operation).filter(Operation.id == operation_id).first()
     if not operation:
         raise HTTPException(status_code=404, detail="Операция не найдена")
+
+    if str(operation.user_id) != str(user_id):
+        raise HTTPException(status_code=403, detail="Нет доступа к этой операции")
 
     file_path = os.path.join(UPLOAD_FOLDER, operation.file_name)
     if not os.path.exists(file_path):
@@ -79,7 +85,7 @@ def get_file_response(operation_id: int, user_id: int, db: Session):
     return FileResponse(file_path, filename=operation.file_name)
 
 
-def get_operations_by_user(user_id: int, db: Session, status_filter=None, sort_by=None):
+def get_operations_by_user(user_id: str, db: Session, status_filter=None, sort_by=None):
     """
     Возвращает список операций пользователя с возможностью фильтрации и сортировки.
     """
