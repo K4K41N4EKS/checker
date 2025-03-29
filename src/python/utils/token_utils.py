@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import HTTPException, status
 import os
 
-SECRET_KEY = os.getenv("AUTH_SECRET_KEY", "changeme")
+SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = "HS256"
 
 def decode_token(token: str) -> dict:

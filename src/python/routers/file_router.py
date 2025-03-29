@@ -6,8 +6,7 @@ from src.python.services import file_services
 from python.dependencies.auth import get_current_user
 from src.python.database import get_db
 
-router = APIRouter()
-
+router = APIRouter(prefix="/files", tags=["Files"])
 
 @router.post("/upload", response_model=FileUploadResponse)
 async def upload_file(
