@@ -8,3 +8,4 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     
     operations = relationship("Operation", back_populates="user")
+    templates = relationship("Template", back_populates="user")
