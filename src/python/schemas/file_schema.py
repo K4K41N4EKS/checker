@@ -13,7 +13,7 @@ class OperationStatus(str, Enum):
 class FileUploadResponse(BaseModel):
     filename: str
     download_url: str
-    user_id: int
+    user_id: str
     operation_id: int
 
 

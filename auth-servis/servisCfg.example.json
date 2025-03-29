@@ -1,0 +1,14 @@
+{
+    "dbhost": "postgres-auth",
+    "dbport": 5432,
+    "dbname": "authdbforcheckapp",
+    "dbuser": "admin",
+    "dbpasswd": "123456",
+    "secret": "ASFDAJSHGjgjgjfHFhDHF7R6R6fG68vb6F6FBn67gSDFGHKSDFHGAJSD67576T8NY8NM8nm887nm87y",
+    "checker_secret": "0UwYvejajYpIkYSugylaGyZIjypIGYSaciKalIpALEfyGonysEJUHYmOJOWimIF!",
+    "access-t-lifestyle-time-hours": 0,
+    "access-t-lifestyle-time-minuts": 10,
+    "refresh-t-lifestyle-time-hours": 48,
+    "refresh-t-lifestyle-time-minuts": 0
+
+}

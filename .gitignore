@@ -17,6 +17,7 @@ auth-servis/exmpl-desctop-with-auth/build
 
 #vscode dirs
 auth-servis/.vscode
+.vscode
 
 #external libs dirs if dont't need
 #External
