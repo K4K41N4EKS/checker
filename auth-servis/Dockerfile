@@ -40,9 +40,12 @@ RUN cmake .. && make && make install
 WORKDIR /usr/src/auth-servis
 COPY . .
 
-CMD cd /usr/src/auth-servis && mkdir build && cd build && cmake .. && \
-cmake --build . && \
-/usr/src/auth-servis/build/auth-servis \ 
+#CMD cd /usr/src/auth-servis && mkdir build && cd build && cmake .. && \
+#cmake --build . && \
+#/usr/src/auth-servis/build/auth-servis \ 
+#/usr/src/auth-servis/config.example.nossl.json \ 
+#/usr/src/auth-servis/servisCfg.example.json
+
+CMD /usr/src/auth-servis/build/auth-servis \ 
 /usr/src/auth-servis/config.example.nossl.json \ 
 /usr/src/auth-servis/servisCfg.example.json
-
