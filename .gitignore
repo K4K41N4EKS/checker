@@ -24,3 +24,9 @@ auth-servis/.vscode
 
 #docs (not corrected)
 auth-servis/docs
+
+#logger
+*.log
+file_actions.log
+file_upload.log
+logs

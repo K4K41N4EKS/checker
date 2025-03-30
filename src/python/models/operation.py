@@ -20,5 +20,6 @@ class Operation(Base):
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     status = Column(Enum(OperationStatus), default=OperationStatus.uploaded)
     created_at = Column(DateTime, default=datetime.utcnow)
+    result_path = Column(String, nullable=True)
 
     user = relationship("User", back_populates="operations")
