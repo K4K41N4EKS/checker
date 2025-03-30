@@ -7,7 +7,7 @@ from src.python.utils.token_utils import decode_token
 from src.python.utils.logger_utils import get_logger
 
 security = HTTPBearer()
-logger = get_logger("auth", "auth.log")
+logger = get_logger("dependencies.auth")
 
 def get_current_user(
     creds: HTTPAuthorizationCredentials = Depends(security),
