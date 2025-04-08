@@ -24,6 +24,7 @@ ALLOWED_MIME_TYPES = {
 async def upload_file(
     request: Request,
     file: UploadFile = File(...),
+    template_id: str = Query(default=None, description="ID шаблона оформления (опционально)"),
     user=Depends(get_current_user),
     db: Session = Depends(get_db),
     background_tasks: BackgroundTasks = BackgroundTasks()
@@ -49,9 +50,15 @@ async def upload_file(
                 detail=f"Файл слишком большой. Максимум: {MAX_FILE_SIZE_MB} МБ."
             )
         file.file.seek(0)
+
         filename, operation_id = file_services.save_file(
-            file, user_id=user["user_id"], db=db, background_tasks=background_tasks
+            file=file,
+            user_id=user["user_id"],
+            db=db,
+            background_tasks=background_tasks,
+            template_id=template_id
         )
+
         logger.info(f"[UPLOAD SUCCESS] {user['username']} | {client_ip} | {file.filename} => {filename} | operation_id={operation_id} | User-Agent: {user_agent}")
         return FileUploadResponse(
             filename=filename,
