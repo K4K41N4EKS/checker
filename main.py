@@ -1,10 +1,14 @@
 from fastapi import FastAPI
-from src.python.database.database import init_db
-from src.python.routers import file_router
+from src.python.database import init_db
+from src.python.routers import all_routers
+from src.python.middlewares.rate_limiter import RateLimiterMiddleware
+
 
 app = FastAPI()
+app.add_middleware(RateLimiterMiddleware)
 
-app.include_router(file_router.router, prefix="/file", tags=["file"])
+for router in all_routers:
+    app.include_router(router)
 
 @app.on_event("startup")
 def on_startup():
