@@ -90,6 +90,7 @@ std::string authAndValid::IAuth::generateAndCommitAccessToken(const std::string 
         " WHERE username = " + txn.quote(username) + ";"
     );
     if (!result.empty()) {
+        txn.commit();
         throw std::runtime_error("Unexpected result from Update query");
     }
     txn.commit();
@@ -123,6 +124,7 @@ std::string authAndValid::IAuth::generateAndCommitRefreshToken(const std::string
         " WHERE username = " + txn.quote(username) + ";"
     );
     if (!result.empty()) {
+        txn.commit();
         throw std::runtime_error("Unexpected result from Update query");
     }
     txn.commit();

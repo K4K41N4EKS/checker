@@ -62,29 +62,33 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
 
         pqxx::connection conn(servisCfg.getConnectionArgs());
+        
         pqxx::work txn(conn);
-
         auto result = txn.exec(
             "SELECT * FROM users WHERE username = " + 
             txn.quote(username) + " AND refresh_token = " +
             txn.quote(refresh_t) + ";"
         );
         if (result.empty()) {
-            throw std::runtime_error("Unexpected result from Select query");
+            txn.commit();
+            throw std::runtime_error("Logged in user not found");
         }
         txn.commit();
 
 
         // завершение сессии польз. удалением рефреш и ацесс токенов из БД
-        result = txn.exec(
-            "UPDATE users SET access_token = NULL, refresh_token = NULL WHERE username = " + 
-            txn.quote(username) + " AND refresh_token = " +
-            txn.quote(refresh_t) + ";"
+        pqxx::work update_txn(conn);
+        auto new_result = update_txn.exec(
+            "UPDATE users SET access_token = '', "
+            "refresh_token = '' WHERE username = " + 
+            update_txn.quote(username) + " AND refresh_token = " +
+            update_txn.quote(refresh_t) + ";"
         );
-        if (result.empty()) {
+        if (new_result.affected_rows() == 0) {
+            update_txn.commit();
             throw std::runtime_error("Unexpected result from UPDATE query");
         }
-        txn.commit();
+        update_txn.commit();
 
 
         // отправка ответа об успешном выходе из сессии польз.

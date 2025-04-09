@@ -48,6 +48,7 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
             txn.quote(drogon::utils::getSha256(passwd)) + ";"
         );
         if (result.empty()) {
+            txn.commit();
             throw std::runtime_error("Unexpected result from Select query");
         }
         txn.commit();
