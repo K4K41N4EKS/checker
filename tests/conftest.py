@@ -51,13 +51,13 @@ def logged_user(registered_user, auth_url, test_user):
     assert response.status_code == 200, \
         f"Expected 200, got {response.status_code}. Response: {response.json()}"
     
-    tokens = response.json()
+    tokens = response
     
     yield tokens  # Возвращаем токены тестам
     
     # Пост-обработка: выполняем логаут после завершения тестов
     requests.post(
         f"{auth_url}/logout",
-        headers={"Authorization": f"Bearer {tokens['refresh_token']}"}
+        headers={"Authorization": f"Bearer {tokens.headers['refresh-token']}"}
     )
     
