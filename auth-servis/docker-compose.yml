@@ -1,11 +1,11 @@
 services:
-  auth-for-check-app:
-    image: dipsomask/auth-for-check-app:latest
+  auth-for-check-app-test:
+    image: dipsomask/auth-for-check-app-testing:nobuild
     ports:
       - "3333:3333"
     networks:
       - auth-for-check-app-network
-    container_name: auth-for-check-app
+    container_name: auth-for-check-app-test
 
   postgres:
     image: postgres:latest
@@ -20,7 +20,7 @@ services:
       - "65100:5432"
     networks:
       - auth-for-check-app-network
-    container_name: postgres
+    container_name: postgres-auth
 
 
 networks:

@@ -51,6 +51,7 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
             txn.quote(drogon::utils::getSha256(passwd)) + ")"
         );
         if (!result.empty()) {
+            txn.commit();
             throw std::runtime_error("Unexpected result from INSERT query");
         }
         txn.commit();
@@ -74,6 +75,7 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
                 txn.quote(user_id) + ";"
             );
             if (!result.empty()) {
+                txn.commit();
                 throw std::runtime_error("Unexpected result from DELETE query");
             }
             txn.commit();

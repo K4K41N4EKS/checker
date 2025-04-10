@@ -5,9 +5,14 @@ from datetime import datetime
 from fastapi import UploadFile, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+from docx import Document
+
+from src.python.utils.docx_zip_comments import add_comments_to_docx_batch
 from src.python.database.database import SessionLocal
 from src.python.models.operation import Operation, OperationStatus
 from src.python.utils.logger_utils import get_logger
+from src.python.services.template_services import get_templates, get_template_by_id
+from src.python.utils.document_analyzer import check_document_format
 
 logger = get_logger("services.file_services")
 
@@ -15,7 +20,7 @@ UPLOAD_FOLDER = "uploaded_files"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
-def save_file(file: UploadFile, user_id: int, db: Session, background_tasks: BackgroundTasks):
+def save_file(file: UploadFile, user_id: int, db: Session, background_tasks: BackgroundTasks, template_id: str | None = None):
     safe_filename = os.path.basename(file.filename)
     unique_name = f"{uuid.uuid4()}_{safe_filename}"
 
@@ -38,7 +43,7 @@ def save_file(file: UploadFile, user_id: int, db: Session, background_tasks: Bac
         db.commit()
         db.refresh(operation)
 
-        background_tasks.add_task(process_file_task, file_path, operation.id)
+        background_tasks.add_task(process_file_task, file_path, operation.id, template_id)
 
         logger.info(f"[SAVE FILE] User {user_id} uploaded {safe_filename} -> {unique_name} (operation_id={operation.id})")
         return unique_name, operation.id
@@ -48,7 +53,7 @@ def save_file(file: UploadFile, user_id: int, db: Session, background_tasks: Bac
         raise HTTPException(status_code=500, detail="Ошибка при сохранении файла")
 
 
-def process_file_task(input_path: str, operation_id: int):
+def process_file_task(input_path: str, operation_id: int, template_id: str | None = None):
     db = SessionLocal()
     try:
         operation = db.query(Operation).filter(Operation.id == operation_id).first()
@@ -59,18 +64,35 @@ def process_file_task(input_path: str, operation_id: int):
         operation.status = OperationStatus.processing
         db.commit()
 
+        # Шаблон
+        if template_id:
+            template = get_template_by_id(db, template_id, operation.user_id)
+        else:
+            templates = get_templates(db, str(operation.user_id))
+            template = templates[0] if templates else None
+
+        if not template:
+            logger.warning(f"[NO TEMPLATE FOUND] operation_id={operation_id}")
+            errors = []
+        else:
+            template_filters = template.filters or {}
+            errors = check_document_format(input_path, template_filters)
+
         base_path, ext = os.path.splitext(input_path)
         result_path = base_path + "_result.docx"
 
-        try:
-            shutil.copy(input_path, result_path)
-        except Exception as e:
-            operation.status = OperationStatus.error
-            db.commit()
-            logger.error(f"[PROCESS FILE COPY ERROR] operation_id={operation_id} | Error: {str(e)}")
-            raise
+        # Копия оригинала
+        Document(input_path).save(result_path)
 
-        user_folder = os.path.basename(os.path.dirname(input_path))
+        # Вставка всех комментариев за один проход
+        if errors:
+            try:
+                add_comments_to_docx_batch(result_path, errors)
+            except Exception as comment_err:
+                logger.warning(f"[COMMENT ERROR] operation_id={operation_id} | {comment_err}")
+
+        # Запись в БД
+        user_folder = os.path.basename(os.path.dirname(result_path))
         file_name = os.path.basename(result_path)
         operation.status = OperationStatus.done
         operation.result_path = os.path.join(user_folder, file_name)
