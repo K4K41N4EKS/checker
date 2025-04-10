@@ -20,7 +20,7 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Invalid headers";
+        err["message"] = "Заполните все поля для регистрации.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k400BadRequest);
@@ -51,7 +51,11 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
             txn.quote(drogon::utils::getSha256(passwd)) + ")"
         );
         if (!result.empty()) {
-            throw std::runtime_error("Unexpected result from INSERT query");
+            throw std::runtime_error(
+                std::string("Имя пользователя '") + 
+                username + 
+                std::string("уже занято, попробуйте другое.")
+            );
         }
         txn.commit();
 
@@ -74,23 +78,18 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
                 txn.quote(user_id) + ";"
             );
             if (!result.empty()) {
-                throw std::runtime_error("Unexpected result from DELETE query");
+                throw std::runtime_error("Ошибка сервиса.");
             }
             txn.commit();
 
-            throw std::runtime_error(
-                std::string("Main servis return status code ") + 
-                std::to_string(resp.status_code) + 
-                std::string(". With message: ") + 
-                resp.text
-            );
+            throw std::runtime_error("Ошибка сервиса, не удаётся связаться с приложением.");
         }
 
 
 
         Json::Value ans;
         ans["status"] = "success";
-        ans["message"] = "User registred successfully";
+        ans["message"] = "Регистрация прошла успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(ans);
         response->setStatusCode(drogon::HttpStatusCode::k200OK);
@@ -102,7 +101,9 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         
         Json::Value err;
         err["status"] = "error";
-        err["error"] = e.what();
+        err["message"] = std::string("Имя пользователя '") + 
+                         username + 
+                         std::string("уже занято, попробуйте другое.");
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+    <link rel="stylesheet" type="text/css" href="/css/auth-servis.css">
+</head>
+<body>
+
+    <h1 id="main-header">Checker servis</h1>
+
+    <form id="registrationForm">
+        <label for="username">Имя пользователя:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Пароль:</label><br>
+        <input type="password" id="password" name="password"><br>
+        <input type="submit" value="Зарегистрироваться">
+    </form>
+    <div id="message"></div> <!-- Элемент для вывода сообщений -->
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            fetch('http://localhost:3333/registration', {
+                method: 'POST',
+                headers: {
+                    'username': username,
+                    'passwd': password
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        try {
+                            const data = JSON.parse(text);
+                            throw new Error(data.message); 
+                        } catch (e) {
+                            throw new Error(`Ошибка ${response.status}: ${text}`); 
+                        }
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                var messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = data.message; // Выводим сообщение из ответа
+                messageDiv.classList.add('show');
+
+                // Скрываем сообщение через несколько секунд
+                setTimeout(function() {
+                    messageDiv.classList.remove('show');
+                }, 3000); // Скрываем через 3 секунды
+            })
+            .catch(error => {
+                var messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = error.message; // Выводим сообщение об ошибке
+                messageDiv.classList.add('show');
+
+                // Скрываем сообщение через несколько секунд
+                setTimeout(function() {
+                    messageDiv.classList.remove('show');
+                }, 3000); // Скрываем через 3 секунды
+            });
+        });
+    </script>
+</body>
+</html>

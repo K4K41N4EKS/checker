@@ -18,7 +18,7 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
         
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Invalid username or password";
+        err["message"] = "Заполните все поля для входа.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k400BadRequest);
@@ -48,7 +48,7 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
             txn.quote(drogon::utils::getSha256(passwd)) + ";"
         );
         if (result.empty()) {
-            throw std::runtime_error("Unexpected result from Select query");
+            throw std::runtime_error("Неверные данные для входа.");
         }
         txn.commit();
 
@@ -57,7 +57,7 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
 
         Json::Value resp;
         resp["status"] = "success";
-        resp["message"] = "User successfully logined";
+        resp["message"] = "Вход выполнен успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
         response->setStatusCode(drogon::HttpStatusCode::k200OK);
@@ -71,7 +71,7 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
         
         Json::Value err;
         err["status"] = "error";
-        err["message"] = e.what();
+        err["message"] = std::string(e.what());
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);

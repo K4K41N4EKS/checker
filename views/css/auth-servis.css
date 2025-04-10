@@ -1,0 +1,81 @@
+body {
+    max-width: 400px; /* Максимальная ширина */
+    margin: 50px auto; /* Отступы и выравнивание по центру */
+    padding: 20px; /* Внутренние отступы */
+    border: 1px solid #ccc; /* Рамка вокруг содержимого */
+    border-radius: 10px; /* Закругленные углы */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Тень */
+    position: relative; /* Добавляем относительное позиционирование */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+label {
+    margin-bottom: 10px;
+}
+
+input {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+
+#message {
+    position: absolute; /* Абсолютное позиционирование */
+    top: 50%; /* Позиция по вертикали */
+    left: 50%; /* Позиция по горизонтали */
+    transform: translate(-50%, -50%); /* Выравнивание по центру */
+    background-color: #f0f0f0;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: none; /* Скрыто по умолчанию */
+}
+
+#message.show {
+    display: block; /* Показывать, когда класс show добавлен */
+}
+
+#main-header {
+    text-align: center;
+    font-size: 3vw; /* Адаптивный размер шрифта */
+    font-weight: bold; /* Жирность шрифта */
+    color: #4CAF50; /* Цвет текста */
+    margin-top: 5vh; /* Отступ сверху */
+    margin-bottom: 5vh; /* Отступ снизу */
+    font-family: 'Arial Black', sans-serif; /* Серьёзный шрифт */
+}
+
+/* Адаптивные стили для формы */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* Уменьшаем внутренние отступы на небольших экранах */
+    }
+    
+    #main-header {
+        font-size: 4vw; /* Увеличиваем размер шрифта на небольших экранах */
+    }
+    
+    input {
+        padding: 5px; /* Уменьшаем внутренние отступы для полей ввода */
+    }
+}

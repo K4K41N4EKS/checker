@@ -17,7 +17,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Invalid refresh-token";
+        err["message"] = "Вы не авторизованы.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
@@ -44,7 +44,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Invalid refresh-token";
+        err["message"] = "Вы не авторизованы.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
@@ -70,7 +70,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
             txn.quote(refresh_t) + ";"
         );
         if (result.empty()) {
-            throw std::runtime_error("Unexpected result from Select query");
+            throw std::runtime_error("Вы не авторизованы.");
         }
         txn.commit();
 
@@ -82,7 +82,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
             txn.quote(refresh_t) + ";"
         );
         if (result.empty()) {
-            throw std::runtime_error("Unexpected result from UPDATE query");
+            throw std::runtime_error("Ошибка сервиса.");
         }
         txn.commit();
 
@@ -90,7 +90,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         // отправка ответа об успешном выходе из сессии польз.
         Json::Value resp;
         resp["status"] = "success";
-        resp["message"] = "User successfully logout";
+        resp["message"] = "Выход выполнен успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
         response->setStatusCode(drogon::HttpStatusCode::k201Created);
@@ -105,7 +105,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Logged in user not found";
+        err["message"] = "Вы не авторизованы.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);

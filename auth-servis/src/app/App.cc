@@ -32,6 +32,61 @@ int app::App::run(int argc, char* argv[]){
         return 2;
     }
 
+    drogon::app().registerPreRoutingAdvice(
+        [](const drogon::HttpRequestPtr& req,
+           drogon::AdviceCallback&& callback,
+           drogon::AdviceChainCallback&& chainCallback){
+            
+            auto resp = drogon::HttpResponse::newHttpResponse();
+            resp->addHeader(
+                "Access-Control-Allow-Origin", 
+                "*"
+            );
+            resp->addHeader(
+                "Access-Control-Allow-Methods", 
+                "POST, GET, OPTIONS"
+            );
+            resp->addHeader(
+                "Access-Control-Allow-Headers", 
+                "Content-Type, username, passwd, refresh-token, access-token"
+            );
+            resp->addHeader(
+                "Access-Control-Expose-Headers", 
+                "access-token, refresh-token"
+            );
+
+            if (req->method() == drogon::HttpMethod::Options) {
+                resp->setStatusCode(drogon::HttpStatusCode::k200OK);
+                callback(resp); // Прерываем цепочку обработки
+            } else {
+                chainCallback(); // Продолжаем обработку
+            }
+        }
+    );
+
+    drogon::app().registerPostHandlingAdvice(
+        [](const drogon::HttpRequestPtr &req, const drogon::HttpResponsePtr &resp) {
+            
+            resp->addHeader(
+                "Access-Control-Allow-Origin", 
+                "*"
+            );
+            resp->addHeader(
+                "Access-Control-Allow-Methods", 
+                "POST, GET, OPTIONS"
+            );
+            resp->addHeader(
+                "Access-Control-Allow-Headers", 
+                "Content-Type, username, passwd, refresh-token, access-token"
+            );
+            resp->addHeader(
+                "Access-Control-Expose-Headers", 
+                "access-token, refresh-token"
+            );
+            
+        });
+
+
     drogon::app()
         .loadConfigFile(serverCfgPath)
         .run();
