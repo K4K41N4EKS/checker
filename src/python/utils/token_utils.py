@@ -8,7 +8,7 @@ from src.python.utils.logger_utils import get_logger
 
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = "HS256"
-logger = get_logger("utils.auth")
+logger = get_logger("utils.auth_token")
 
 def decode_token(token: str) -> dict:
     logger.debug(f"[DECODE START] token_preview={token[:10]}...")
