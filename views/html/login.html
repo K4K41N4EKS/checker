@@ -47,12 +47,7 @@
             .then(response => {
                 if (!response.ok) {
                     return response.text().then(text => {
-                        try {
-                            const data = JSON.parse(text);
-                            throw new Error(data.message); 
-                        } catch (e) {
-                            throw new Error(`Ошибка: ${text}`);
-                        }
+                        throw new Error(`Ошибка ${response.status}: Ошибка входа.`);
                     });
                 }
 
