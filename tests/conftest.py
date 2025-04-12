@@ -65,7 +65,7 @@ def logged_user(registered_user, auth_url, test_user):
         headers=tokens.refresh_header
     )
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def valid_template_data():
     return {
         "name": "ГОСТ-2 2024",
@@ -100,7 +100,7 @@ def valid_template_data():
         }
     }
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def invalid_template_data():
     return {
         "name": "Invalid Template",

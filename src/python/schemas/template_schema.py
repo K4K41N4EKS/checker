@@ -61,14 +61,14 @@ class FiltersModel(BaseModel):
     start_after_heading: str
     margins: MarginModel
     styles: dict[str, StyleModel]
-    heading_levels: Optional[Literal[1, 2, 3]] = None
-    numbering_type: Optional[Literal["sectional", "continuous"]] = None
-    page_number_format: Optional[
-        Literal["bottom_center", "bottom_right", "top_right"]
-    ] = None
-    toc_format: Optional[
-        Literal["with_dots", "without_dots", "without_numbers"]
-    ] = None
+    # heading_levels: Optional[Literal[1, 2, 3]] = None
+    # numbering_type: Optional[Literal["sectional", "continuous"]] = None
+    # page_number_format: Optional[
+    #     Literal["bottom_center", "bottom_right", "top_right"]
+    # ] = None
+    # toc_format: Optional[
+    #     Literal["with_dots", "without_dots", "without_numbers"]
+    # ] = None
 
     @field_validator('styles')
     @classmethod
