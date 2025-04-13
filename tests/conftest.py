@@ -1,10 +1,10 @@
 import requests
 import pytest
 from src.python.schemas.user_schema import UserTokens
-from src.python.database.database import SessionLocal
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from src.python.models.user import User
+# from src.python.database.database import SessionLocal
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker
+# from src.python.models.user import User
 
 @pytest.fixture(scope="session")
 def test_client():
@@ -12,11 +12,11 @@ def test_client():
 
 @pytest.fixture(scope="session")
 def auth_url():
-    return "http://0.0.0.0:3333"
+    return "http://localhost:3333"
 
 @pytest.fixture(scope="session")
 def app_url():
-    return "http://0.0.0.0:3000"
+    return "http://localhost:3000"
 
 @pytest.fixture(scope="session")
 def test_user() -> dict[str, str]:
@@ -39,7 +39,7 @@ def registered_user(auth_url, test_user):
     # Здесь можно добавить очистку, если API предоставляет удаление пользователя
 
 @pytest.fixture
-def logged_user(registered_user, auth_url, test_user):
+def logged_user(registered_user, auth_url, test_user, app_url):
     """Фикстура, которая логинит пользователя и возвращает токены, очищая refresh после тестов"""
     
     response = requests.get(
@@ -59,7 +59,17 @@ def logged_user(registered_user, auth_url, test_user):
     
     yield tokens
     
-    # Пост-обработка: выполняем логаут после завершения тестов
+    # Пост-обработка: выполняем удаление данных с сервера и логаут после завершения тестов
+    response = requests.get(
+        f"{app_url}/templates",
+        headers=tokens.auth_header
+    )
+    for template in response.json():
+        response = requests.delete(
+            f"{app_url}/templates/{template["id"]}",
+            headers=tokens.auth_header
+        )
+    
     requests.post(
         f"{auth_url}/logout",
         headers=tokens.refresh_header
@@ -115,3 +125,11 @@ def invalid_template_data():
             "styles": {}
         }
     }
+
+@pytest.fixture
+def created_template(logged_user, app_url, valid_template_data):
+    return requests.post(
+        f"{app_url}/templates",
+        json=valid_template_data,
+        headers=logged_user.auth_header
+    )
