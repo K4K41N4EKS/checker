@@ -65,8 +65,9 @@ def logged_user(registered_user, auth_url, test_user, app_url):
         headers=tokens.auth_header
     )
     for template in response.json():
+        id = template["id"]
         response = requests.delete(
-            f"{app_url}/templates/{template["id"]}",
+            f"{app_url}/templates/{id}",
             headers=tokens.auth_header
         )
     

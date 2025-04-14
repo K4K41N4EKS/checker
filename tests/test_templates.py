@@ -74,13 +74,11 @@ def test_template_get_one(test_client, logged_user, app_url, created_template):
     
     # Валидация ответа
     try:
-        templates = response.json()
-        assert isinstance(templates, list), "Response should be a list"
-        
-        for template in templates:
-            validated = ValidatedTemplateResponse(**template)
-            assert validated.id, "Template should have ID"
-            assert validated.user_id, "Template should have user_id"
+        template = response.json()
+        validated = ValidatedTemplateResponse(**template)
+        assert validated.id, "Template should have ID"
+        assert validated.user_id, "Template should have user_id"
+            
     except Exception as e:
         pytest.fail(f"Invalid template structure: {str(e)}")
 
@@ -114,23 +112,26 @@ def test_template_update_one(test_client, logged_user, app_url, valid_template_d
 def test_template_delete_one(test_client, logged_user, app_url, created_template):
     template_id = created_template.json()["id"]
     
-    response = test_client.delete(
-        f"{app_url}/templates/{template_id}",
-        headers=logged_user.auth_header
-    )
-    
-    assert response.status_code == 200, \
-        f"Expected 200, got {response.status_code}. Response: {response.json()}"
-
+    # Проверка перед удалением
     response = test_client.get(
         f"{app_url}/templates/{template_id}",
         headers=logged_user.auth_header
     )
-    
     assert response.status_code == 200, \
         f"Expected 200, got {response.status_code}. Response: {response.json()}"
     
-    # Валидация ответа
-    templates = response.json()
-    assert isinstance(templates, list), "Response should be a list"
-    assert len(templates) == 0, "Expected list to be empty, got non-deleted template"
+    # Удаление
+    response = test_client.delete(
+        f"{app_url}/templates/{template_id}",
+        headers=logged_user.auth_header
+    )
+    assert response.status_code == 200, \
+        f"Expected 200, got {response.status_code}. Response: {response.json()}"
+
+    # Проверка после удаления
+    response = test_client.get(
+        f"{app_url}/templates/{template_id}",
+        headers=logged_user.auth_header
+    )
+    assert response.status_code == 404, \
+        f"Expected 404, got {response.status_code}. Response: {response.json()}"
