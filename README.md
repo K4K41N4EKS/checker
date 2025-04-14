@@ -9,3 +9,12 @@ docker compose up
 ```
 docker-compose up
 ```
+## Html страницы входа и регистрации
+Для страницы входа
+```
+http://localhost:3001/checker/login
+```
+Для страницы регистрации
+```
+http://localhost:3001/checker/registration
+```

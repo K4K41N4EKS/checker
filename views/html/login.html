@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Вход</title>
+    <link rel="stylesheet" type="text/css" href="/css/auth-servis.css">
+</head>
+<body>
+
+    <h1 id="main-header">Checker servis</h1>
+
+    <form id="loginForm">
+        <label for="username">Имя пользователя:</label><br>
+        <input type="text" id="username" name="username"><br>
+        <label for="password">Пароль:</label><br>
+        <input type="password" id="password" name="password"><br>
+        <input type="submit" value="Войти">
+    </form>
+    <div id="message"></div> <!-- Элемент для вывода сообщений -->
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Проверяем наличие токенов в хранилищах
+            if (sessionStorage.getItem('access-token') && localStorage.getItem('refresh-token')) {
+                var messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = 'Вы уже авторизованы';
+                messageDiv.classList.add('show');
+
+                // Скрываем сообщение через несколько секунд
+                setTimeout(function() {
+                    messageDiv.classList.remove('show');
+                }, 3000); // Скрываем через 3 секунды
+
+                return; // Прерываем функцию, чтобы не отправлять запрос
+            }
+
+            fetch('http://localhost:3333/login', {
+                method: 'GET',
+                headers: {
+                    'username': username,
+                    'passwd': password
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Ошибка ${response.status}: Ошибка входа.`);
+                    });
+                }
+
+                // Извлекаем токены из заголовков
+                const accessToken = response.headers.get('access-token');
+                const refreshToken = response.headers.get('refresh-token');
+
+                // Извлекаем сообщение из тела ответа
+                return response.json().then(data => {
+                    const message = data.message;
+
+                    if (accessToken && refreshToken) {
+                        // Сохраняем токены
+                        sessionStorage.setItem('access-token', accessToken);
+                        localStorage.setItem('refresh-token', refreshToken);
+
+                        // Показываем сообщение
+                        var messageDiv = document.getElementById('message');
+                        messageDiv.innerHTML = message;
+                        messageDiv.classList.add('show');
+
+                        // Скрываем сообщение через несколько секунд
+                        setTimeout(function() {
+                            messageDiv.classList.remove('show');
+                        }, 3000); // Скрываем через 3 секунды
+                    } else {
+                        throw new Error(message); // Выбрасываем ошибку с сообщением
+                    }
+                });
+            })
+            .catch(error => {
+                var messageDiv = document.getElementById('message');
+                messageDiv.innerHTML = error.message;
+                messageDiv.classList.add('show');
+
+                // Скрываем сообщение через несколько секунд
+                setTimeout(function() {
+                    messageDiv.classList.remove('show');
+                }, 3000); // Скрываем через 3 секунды
+            });
+        });
+    </script>
+</body>
+</html>

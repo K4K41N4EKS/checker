@@ -69,6 +69,17 @@ services:
     entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
     networks:
       - checker-network
+    
+  web-server-node:
+    build:
+      context: .
+      dockerfile: expres-server.dockerfile
+    ports:
+      - "3001:3001"
+    networks:
+      - checker-network
+    container_name: web-server-node
+
 
 networks:
   checker-network:
