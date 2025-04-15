@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel='stylesheet' href='../css/settings-style.css'>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <title>Настройки проверщика</title>
+    </head>
+    
+    <body>
+    <hr>
+    <div class="table">
+        
+        <div class="table-container">
+        <div class="table-container-left">
+            <table>
+                <tbody>
+                    
+                    <tr>
+                        <td>Шрифт:</td>
+                        <td>
+                            <select id="font-name" onchange="handleDropdownChange(this)">
+                                <option value="1">Times New Roman</option>
+                                <option value="2">Arial</option>
+                                <option value="3">Calibri</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Размер шрифта:</td>
+                        <td>
+                            <select id="font-size" onchange="handleDropdownChange(this)">
+                                <option value="1">12</option>
+                                <option value="2">14</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Междустрочный интервал:</td>
+                        <td>
+                            <select id="line-spacing" onchange="handleDropdownChange(this)">
+                                <option value="1">Одинарный (1)</option>
+                                <option value="2">Полуторный (1.5)</option>
+                                <option value="3">Двойной (2)</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Абзацный отступ:</td>
+                        <td>
+                            <select id="first-line-indent" onchange="handleDropdownChange(this)">
+                                <option value="1">1.25 см</option>
+                                <option value="2">1 см</option>
+                                <option value="3">1.5 см</option>
+                                <option value="4">Без отступа</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Поля страницы:</td>
+                        <td>
+                            <select id="page-margins" onchange="handleDropdownChange(this)">
+                                <option value="1">Стандартные</option>
+                                <option value="2">Узкие</option>
+                                <option value="3">Широкие</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Форматирование заголовков:</td>
+                        <td>
+                            <select id="formatting-headings" onchange="handleDropdownChange(this)">
+                                <option value="1">Заголовок 1</option>
+                                <option value="2">Заголовок 2</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Расположение заголовков:</td>
+                        <td>
+                            <select id="heading-position" onchange="handleDropdownChange(this)">
+                                <option value="1">По центру</option>
+                                <option value="2">По левому краю</option>
+                            </select>
+                        </td> 
+                    </tr>
+                    <tr>
+                        <td>Нумерация таблиц и рисунков</td>
+                        <td>
+                            <select id="numbering-tables-figures" onchange="handleDropdownChange(this)">
+                                <option value="1">По разделам</option>
+                                <option value="2">Сквозная</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Формат нумерации страниц:</td>
+                        <td>
+                            <select id="page-numbering-format" onchange="handleDropdownChange(this)">
+                                <option value="1">Снизу по центру</option>
+                                <option value="2">Снизу справа</option>
+                                <option value="3">Сверху справа</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Оформление оглавления:</td>
+                        <td>
+                            <select id="contents-design" onchange="handleDropdownChange(this)">
+                                <option value="1">Автоматическое</option>
+                                <option value="2">Без точек</option>
+                                <option value="3">Без номера</option>
+                            </select>
+                        </td> 
+                    </tr>
+                    <tr>
+                        <td>Типы заголовков:</td>
+                        <td>
+                            <select id="types-headlines" onchange="handleDropdownChange(this)">
+                                <option value="1">Стандарт</option>
+                                <option value="2">Не стандарт</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        <div class="table-container-right">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>
+                            <p id="selectedTitle" class = "description">Подсказка</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p id="description" style="height: 564px">Здесь появится подробная информация о настройке</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+        
+            <div class="start-button-container">
+                <button type="submit" class="start-button" onclick="sendData()">Проверить</button>
+            </div>
+        
+    </div>
+     <hr>   
+</body>
+</html>
+<script src="../js/button.js"></script>

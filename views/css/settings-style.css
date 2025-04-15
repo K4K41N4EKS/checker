@@ -1,0 +1,114 @@
+body{
+    font-family: 'Roboto', sans-serif; /* Шрифт */
+    overflow-x:clip; /* Блокировка горизонтальной прокрутки */
+    cursor: auto; /* Изменение курсора (стоит стандартный) */
+    margin: 0;
+}
+
+hr{
+    border: none;
+    background-color: black;
+    color: black;
+    height: 60px;
+    margin: 0;
+    padding: 0;
+}
+
+.table {
+    width: 100%; /* Ширина таблицы 100% */
+    padding: 10px; /* Отступы */
+}
+
+.table-container {
+    display: flex; /* Позиционирование таблиц */
+    width: 100%; /* Занимает всю ширину */
+}
+
+.table-container-left {
+    flex: 0 0 50%; /* Занимает 50% ширины */
+    justify-content: flex-start; /* Выравнивание по левому краю */
+    margin: 0; /* Отступ */
+    height: 700px; /* Высота на весь экран */
+    font-size: 20px; /* Размер шрифта */
+    font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
+    margin-right: 20px; /* Отступ справа */
+}
+
+.table-container-right {
+    flex: 1; /* Занимает оставшуюся ширину */
+    justify-content: flex-start; /* Выравнивание по левому краю */
+    margin: 0; /* Убираем отступы */
+    height:700px; /* Высота на весь экран */
+    font-size: 20px; /* Размер шрифта */
+    font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
+    padding-right: 20px; /* Отступ справа */
+}
+
+.file-container {
+  display: flex; /* Выравнивание элементов */
+  align-items: center; /* Центрирование по вертикали */
+  gap: 10px; /* Промежуток между элементами */
+  justify-content: flex-start; /* Элементы выравниваются по началу */
+}
+
+.start-button-container{
+  display: flex; /* Объекты в столбик*/
+  justify-content: center; /* Центрирование содержимого */
+  padding: 10px 20px; /* Отступы */
+}
+
+.start-button{
+  /*border: 2px solid black;*/ /* Рамка */
+  background-color: black; /* Цвет заднего фона */
+  color: white; /* Цвет текста */
+  border-radius: 5px; /* Закругление кнопки */
+  font-size: 20px; /* Размер текста */
+  font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
+  width: 150px; /* Ширина */
+  height: 40px; /* Высота */
+  /* box-shadow: 2px 2px 2px gray;/* /* Тень */
+}
+
+.description{
+    margin-top: 12px; /* Отступ */
+    height: 12px; /* Высота */
+    display: flex; /* Центрирование */
+    justify-content: center; /* Центрирование */
+}
+
+table {
+    width: 100%; /* Ширина */
+    border-collapse: collapse; /* Убирать пробелы между ячейками */
+    table-layout: fixed; /* Фиксированная ширина колонок */
+}
+
+th, td {
+    border: 2px solid black; /* Рамка */
+    padding: 8px; /* Отступ */
+    text-align: left; /* Выравнивание */
+    overflow: hidden; /* Скрыть переполнение текста */
+    text-overflow: ellipsis; /* Добавить многоточие для переполненного текста */
+    white-space: nowrap; /* Запретить перенос текста */
+}
+
+th {
+    background-color: #f2f2f2; /* Цвет фона */
+}
+
+select {
+    border: none; /* Убрать рамку */
+    background-color: #f0f0f0; /* Цвет фона */
+    padding: 10px; /* Отступы */
+    border-radius: 5px; /* Закругление */
+    outline: none; /* Убрать обводку при фокусе */
+    font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
+    cursor: pointer; /* Указатель при наведении */
+    font-size: 20px; /* Размер шрифта */
+    width: 100%; /* Ширина */
+}
+
+select:focus {
+    outline: none; /* Убрать обводку при фокусе */
+    cursor: pointer; /* Указатель при наведении */
+    
+}

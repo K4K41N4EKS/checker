@@ -1,0 +1,128 @@
+body{
+    font-family: 'Roboto', sans-serif; /* Шрифт */
+  
+}
+
+
+.title{
+    margin: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.container{
+  display: flex; /* Объекты в столбик */
+  flex-direction: column; /* Объекты в столбик */
+  align-items: center; /* Центрирование по горизонтали */
+  justify-content: center; /* Центрирование по вертикали */
+  height: 100vh; /* Высота (на весь экран) */
+  margin: 0; /* Отступы */
+  text-align: center; /* Центрирование текста */
+}
+
+.text-main{
+  font-size: 20px; /* Размер текста */
+}
+
+.file-container {
+  display: flex; /* Используем flexbox для выравнивания элементов */
+  align-items: center; /* Центрирование по вертикали */
+  gap: 10px; /* Промежуток между элементами */
+  justify-content: flex-start; /* Элементы выравниваются по началу */
+}
+
+.file-button{
+  border: 2px solid black; /* Рамка */
+  border-radius: 5px; /* Закругление кнопки */
+  font-size: 25px; /* Размер текста */
+  width: 400px; /* Ширина */
+  height: 60px; /* Высота */
+  display: inline-block; /* Чтобы кнопка отображалась как блочный элемент */
+  text-align: center; /* Центрирование текста внутри кнопки */
+  line-height: 60px; /* Центрирование текста по вертикали */
+  cursor: pointer; /* Указатель при наведении */
+  font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
+  
+
+}
+
+#fileInput{
+  display: none; /* Скрыть стандартный input */
+  
+}
+
+#fileName{
+  font-size: 20px; /* Размер текста */
+  font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
+}
+
+.start-button-container{
+  display: flex; /* Объекты в столбик*/
+  justify-content: center; /* Центрирование содержимого */
+  padding: 10px 20px; /* Отступы */
+}
+/*  */
+.start-button{
+  /*border: 2px solid black;*/ /* Рамка */
+  background-color: black; /* Цвет заднего фона */
+  color: white; /* Цвет текста */
+  border-radius: 5px; /* Закругление кнопки */
+  font-size: 20px; /* Размер текста */
+  font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
+  width: 150px; /* Ширина */
+  height: 40px; /* Высота */
+  /* box-shadow: 2px 2px 2px gray;/* /* Тень */
+}
+
+
+
+.button {
+  inline-size: 200px;
+  padding: 0.5lh 1.5lh;
+  font: inherit;
+  background-color: black;
+  color:white;
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover,
+.button:focus-visible {
+  background-color: gray;
+}
+
+.menu {
+  inline-size: 200px;
+  padding: 0;
+  position: relative;
+  text-align: center;
+  display: grid;
+  margin-block-start: 0.1lh;
+  background-color: black;
+
+  overflow: hidden;
+  line-height: 0;
+  color: transparent;
+  transition: line-height 0.5s, color 0.5s;
+}
+
+.menu-item {
+  overflow: hidden;
+}
+
+.menu-link {
+  display: block;
+  padding: 0.5lh 5px;
+  text-decoration: none;
+  color: white;
+}
+
+.menu-link:hover,
+.menu-link:focus-visible {
+  background-color: gray;
+}
+
+.button.active ~ .menu {
+  line-height: 1.2;
+  color: currentColor;
+}

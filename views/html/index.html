@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel='stylesheet' href='style.css'>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Нормоконтроль</title>
+</head>
+<body>
+  <!--Тест
+    <div class="title"> 
+        <div class="content">
+        
+    
+        <div class="font">
+            <button
+              class="button"
+              aria-expanded="false"
+              aria-controls="font-list"
+            >
+              Шрифт
+            </button>
+
+            <ul class="menu" id="font-list" aria-hidden="true">
+              <li class="menu-item">
+                <a href="#" class="menu-link" tabindex="-1">Times New Roman</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="menu-link" tabindex="-1">Arial</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="menu-link" tabindex="-1">Calibri</a>
+              </li>
+            </ul>
+        </div>
+        <div class="size-font">
+            <button
+              class="button"
+              aria-expanded="false"
+              aria-controls="size-list"
+            >
+              Размер
+            </button>
+
+            <ul class="menu" id="size-list" aria-hidden="true">
+              <li class="menu-item">
+                <a href="#" class="menu-link" tabindex="-1">Маленький</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="menu-link" tabindex="-1">Средний</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="menu-link" tabindex="-1">Большой</a>
+              </li>
+            </ul>
+        </div>
+    </div>
+  </div> -->
+  
+  <!--Рабочее-->
+<div class="container">
+  <div class="text-main">
+      <h1>Выберите файл для проверки нормоконтроля</h1>
+  </div>
+  <form onsubmit="handleFileUpload(event); event.preventDefault();">
+      <div class="file-container">
+          <input type="file" id="fileInput" accept=".docx,.doc" required onchange="updateFileName()">
+          <label for="fileInput" class="file-button">Выбрать файл</label>
+          <span id="fileName">Ваш файл: Выберите файл</span>
+      </div>
+      <div class="start-button-container">
+          <button class="start-button" type="submit">Начать</button>
+      </div>
+  </form>
+</div>
+  
+    <script src="button.js"></script>
+</body>
+</html>

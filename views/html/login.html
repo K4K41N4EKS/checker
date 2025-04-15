@@ -73,6 +73,9 @@
                         setTimeout(function() {
                             messageDiv.classList.remove('show');
                         }, 3000); // Скрываем через 3 секунды
+						
+						// Переход на страницу с настройками
+						window.location.href = 'settings.html';
                     } else {
                         throw new Error(message); // Выбрасываем ошибку с сообщением
                     }
