@@ -1,9 +1,10 @@
 import requests
 import pytest
-from src.python.database.database import SessionLocal
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from src.python.models.user import User
+from src.python.schemas.user_schema import UserTokens
+# from src.python.database.database import SessionLocal
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker
+# from src.python.models.user import User
 
 @pytest.fixture(scope="session")
 def test_client():
@@ -11,11 +12,11 @@ def test_client():
 
 @pytest.fixture(scope="session")
 def auth_url():
-    return "http://0.0.0.0:3333"
+    return "http://localhost:3333"
 
 @pytest.fixture(scope="session")
 def app_url():
-    return "http://0.0.0.0:3000"
+    return "http://localhost:3000"
 
 @pytest.fixture(scope="session")
 def test_user() -> dict[str, str]:
@@ -38,7 +39,7 @@ def registered_user(auth_url, test_user):
     # Здесь можно добавить очистку, если API предоставляет удаление пользователя
 
 @pytest.fixture
-def logged_user(registered_user, auth_url, test_user):
+def logged_user(registered_user, auth_url, test_user, app_url):
     """Фикстура, которая логинит пользователя и возвращает токены, очищая refresh после тестов"""
     
     response = requests.get(
@@ -51,13 +52,85 @@ def logged_user(registered_user, auth_url, test_user):
     assert response.status_code == 200, \
         f"Expected 200, got {response.status_code}. Response: {response.json()}"
     
-    tokens = response
-    
-    yield tokens  # Возвращаем токены тестам
-    
-    # Пост-обработка: выполняем логаут после завершения тестов
-    requests.post(
-        f"{auth_url}/logout",
-        headers={"Authorization": f"Bearer {tokens.headers['refresh-token']}"}
+    tokens = UserTokens(
+        access_token=response.headers["access-token"],
+        refresh_token=response.headers["refresh-token"]
     )
     
+    yield tokens
+    
+    # Пост-обработка: выполняем удаление данных с сервера и логаут после завершения тестов
+    response = requests.get(
+        f"{app_url}/templates",
+        headers=tokens.auth_header
+    )
+    for template in response.json():
+        id = template["id"]
+        response = requests.delete(
+            f"{app_url}/templates/{id}",
+            headers=tokens.auth_header
+        )
+    
+    requests.post(
+        f"{auth_url}/logout",
+        headers=tokens.refresh_header
+    )
+
+@pytest.fixture(scope="session")
+def valid_template_data():
+    return {
+        "name": "ГОСТ-2 2024",
+        "filters": {
+            "start_after_heading": "Оглавление",
+            "margins": {
+                "top": 2,
+                "bottom": 2,
+                "left": 3,
+                "right": 1.5
+            },
+            "styles": {
+                "Normal": {
+                    "font_name": ["Times New Roman"],
+                    "font_size": [14],
+                    "font_color_rgb": "000000",
+                    "bold": False,
+                    "italic": False,
+                    "underline": False,
+                    "all_caps": False,
+                    "alignment": "JUSTIFY",
+                    "line_spacing": 1.5,
+                    "first_line_indent": 1.25
+                },
+                "Caption": {
+                    "font_name": ["Times New Roman"],
+                    "font_size": [12],
+                    "alignment": "CENTER",
+                    "line_spacing": 1
+                }
+            }
+        }
+    }
+
+@pytest.fixture(scope="session")
+def invalid_template_data():
+    return {
+        "name": "Invalid Template",
+        "filters": {
+            "start_after_heading": "Оглавление",
+            "margins": {
+                "top": "invalid",  # Неправильный тип
+                "bottom": 2,
+                "left": 3,
+                "right": 1.5
+            },
+            "styles": {}
+        }
+    }
+
+@pytest.fixture
+def created_template(logged_user, app_url, valid_template_data):
+    return requests.post(
+        f"{app_url}/templates",
+        json=valid_template_data,
+        headers=logged_user.auth_header
+    )

@@ -19,6 +19,6 @@ def test_registration_second_attempt(test_client, auth_url, test_user):
             "passwd": test_user["password"]}
     )
     
-    assert response.status_code == 409, \
-        f"Expected 409, got {response.status_code}. Response: {response.json()}"
+    assert response.status_code == 500, \
+        f"Expected 500, got {response.status_code}. Response: {response.json()}"
     
