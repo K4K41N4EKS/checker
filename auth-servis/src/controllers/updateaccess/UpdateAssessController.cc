@@ -1,5 +1,6 @@
 #include "UpdateAssessController.h"
 #include "ServisConfig.h"
+#include "_auth-servisError.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -13,11 +14,23 @@ void UpdateAssessController::updateAccessToken(const drogon::HttpRequestPtr &req
     
     auto headers = (*req).getHeaders();
 
-    if (headers.empty() || headers.find("refresh-token") == headers.end() || 
-        headers["refresh-token"].empty()){
+    try
+    {
+        if (headers.empty() || 
+            headers.find("refresh-token") == headers.end() || 
+            headers["refresh-token"].empty() ||
+            headers["refresh-token"] == ""){
+
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::UpdateAccessModule_EmptyRefreshToken
+            );
+        }
+    }
+    catch(const std::exception& e)
+    {
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Invalid parms";
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
@@ -25,6 +38,7 @@ void UpdateAssessController::updateAccessToken(const drogon::HttpRequestPtr &req
         callback(response);
         return;
     }
+    
 
     std::string refreshToken = headers["refresh-token"];
     std::string username = getUsernameFromToken(refreshToken);
@@ -38,26 +52,22 @@ void UpdateAssessController::updateAccessToken(const drogon::HttpRequestPtr &req
 
 
         pqxx::connection conn(servisCfg.getConnectionArgs());
-        pqxx::work txn(conn);
+        pqxx::work userExistenceCheck_Txn(conn);
 
-        auto result = txn.exec(
-            "SELECT * FROM users WHERE username = " + txn.quote(username) +
-            " AND refresh_token = " + txn.quote(refreshToken) + ";"
+        auto result = userExistenceCheck_Txn.exec(
+            "SELECT * FROM users WHERE username = " + 
+            userExistenceCheck_Txn.quote(username) +
+            " AND refresh_token = " + 
+            userExistenceCheck_Txn.quote(refreshToken) + ";"
         );
         if(result.empty()){
-            Json::Value err;
-            err["status"] = "error";
-            err["message"] = "Invalid or expired refresh token";
 
-            txn.commit();
-
-            auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-            response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized); 
-            
-            callback(response);
-            return;
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::UpdateAccessModule_UnregisteredRefreshToken
+            );
+        
         }
-        txn.commit();
+        userExistenceCheck_Txn.commit();
 
         validateRefreshToken(refreshToken);
 

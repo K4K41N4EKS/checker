@@ -1,5 +1,6 @@
 #include "LogoutController.h"
 #include "ServisConfig.h"
+#include "_auth-servisError.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -12,20 +13,32 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
     
     auto headers = (*req).getHeaders();
         
-    if(headers.empty() || headers.find("refresh-token") == headers.end() || 
-       headers["refresh-token"].empty()){
-        
+    try
+    {
+        if(headers.empty() || 
+            headers.find("refresh-token") == headers.end() || 
+            headers["refresh-token"].empty() || 
+            headers["refresh-token"] == ""){
+            
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::LogoutModule_EmptyRefreshToken
+            );
+
+        }
+    }
+    catch(const std::exception& e)
+    {
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Вы не авторизованы.";
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
         
         callback(response);
         return;
-
     }
+    
 
     std::string refresh_t = headers["refresh-token"];
     std::string username;
@@ -38,14 +51,11 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         username = getUsernameFromToken(refresh_t);
 
     }
-    catch(const std::exception& e)
-    {
-        std::cout << e.what() << '\n';
+    catch(const std::exception& e){
 
         Json::Value err;
         err["status"] = "error";
-        err["message"] = std::string("Вы не авторизованы. (такого пользователя нет - '") +
-        std::string(username) + std::string("'");
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
@@ -64,16 +74,19 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
         pqxx::connection conn(servisCfg.getConnectionArgs());
         
-        pqxx::work txn(conn);
-        auto result = txn.exec(
+        pqxx::work userExistenceAndLoginedCheck_Txn(conn);
+        auto result = userExistenceAndLoginedCheck_Txn.exec(
             "SELECT * FROM users WHERE username = " + 
-            txn.quote(username) + " AND refresh_token = " +
-            txn.quote(refresh_t) + ";"
+            userExistenceAndLoginedCheck_Txn.quote(username) + 
+            " AND refresh_token = " +
+            userExistenceAndLoginedCheck_Txn.quote(refresh_t) + ";"
         );
         if (result.empty()) {
-            throw std::runtime_error("Вы не авторизованы.");
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::LogoutModule_UnauthorizedUser
+            );
         }
-        txn.commit();
+        userExistenceAndLoginedCheck_Txn.commit();
 
 
         // завершение сессии польз. удалением рефреш и ацесс токенов из БД
@@ -85,7 +98,9 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
             update_txn.quote(refresh_t) + ";"
         );
         if (result.empty()) {
-            throw std::runtime_error("Ошибка сервиса.");
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::LogoutModule_CantDeleteTokens
+            );
         }
         update_txn.commit();
 
@@ -96,7 +111,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         resp["message"] = "Выход выполнен успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
-        response->setStatusCode(drogon::HttpStatusCode::k201Created);
+        response->setStatusCode(drogon::HttpStatusCode::k200OK);
 
         callback(response);
 
@@ -108,7 +123,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Вы не авторизованы.";
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);

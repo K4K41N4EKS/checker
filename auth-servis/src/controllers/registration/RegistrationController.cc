@@ -1,5 +1,6 @@
 #include "RegistrationController.h"
 #include "ServisConfig.h"
+#include "_auth-servisError.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -14,21 +15,32 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
 
     auto headers = (*req).getHeaders();
 
-    if(headers.empty() || headers.find("username") == headers.end() || 
-        headers.find("passwd") == headers.end() || 
-        headers["username"].empty() || headers["passwd"].empty()){
-        
+    try
+    {
+        if(headers.empty() || headers.find("username") == headers.end() || 
+            headers.find("passwd") == headers.end() || 
+            headers["username"].empty() || headers["passwd"].empty() ||
+            headers["username"] == "" || headers["passwd"] == ""){
+            
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::RegistrationModule_IncompleteData
+            );
+
+        }
+    }
+    catch(const std::exception& e)
+    {
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Заполните все поля для регистрации.";
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k400BadRequest);
+        response->setStatusCode(drogon::HttpStatusCode::k409Conflict);
         
         callback(response);
         return;
-
     }
+    
 
     std::string username = headers["username"];
     std::string passwd = headers["passwd"];
@@ -42,22 +54,20 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
 
 
         pqxx::connection conn(servisCfg.getConnectionArgs());
-        pqxx::work txn(conn);
+        pqxx::work addNewStringToUsersTable_Txn(conn);
 
-        auto result = txn.exec(
+        auto result = addNewStringToUsersTable_Txn.exec(
             "INSERT INTO users (user_id, username, password_hash) VALUES (" + 
-            txn.quote(user_id) + ", " +
-            txn.quote(username) + ", " +
-            txn.quote(drogon::utils::getSha256(passwd)) + ")"
+            addNewStringToUsersTable_Txn.quote(user_id) + ", " +
+            addNewStringToUsersTable_Txn.quote(username) + ", " +
+            addNewStringToUsersTable_Txn.quote(drogon::utils::getSha256(passwd)) + ")"
         );
         if (!result.empty()) {
-            throw std::runtime_error(
-                std::string("Имя пользователя '") + 
-                username + 
-                std::string("уже занято, попробуйте другое.")
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::RegistrationModule_UsernameIsAlreadyTaken
             );
         }
-        txn.commit();
+        addNewStringToUsersTable_Txn.commit();
 
         
         
@@ -71,18 +81,22 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         if(resp.status_code != 201){
             
             pqxx::connection conn(servisCfg.getConnectionArgs());
-            pqxx::work txn(conn);
+            pqxx::work deleteLastAddedStringToUsersTable_Txn(conn);
 
-            auto result = txn.exec(
+            auto result = deleteLastAddedStringToUsersTable_Txn.exec(
                 "DELETE FROM users WHERE user_id = " + 
-                txn.quote(user_id) + ";"
+                deleteLastAddedStringToUsersTable_Txn.quote(user_id) + ";"
             );
             if (!result.empty()) {
-                throw std::runtime_error("Ошибка сервиса.");
+                throw authServisErrors::AuthServisException(
+                    authServisErrors::ErrorCode::RegistrationModule_CantDeleteUser
+                );
             }
-            txn.commit();
+            deleteLastAddedStringToUsersTable_Txn.commit();
 
-            throw std::runtime_error("Ошибка сервиса, не удаётся связаться с приложением.");
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::RegistrationModule_BadRequestToMainApplication
+            );
         }
 
 
@@ -101,9 +115,7 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         
         Json::Value err;
         err["status"] = "error";
-        err["message"] = std::string("Имя пользователя '") + 
-                         username + 
-                         std::string("уже занято, попробуйте другое.");
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);

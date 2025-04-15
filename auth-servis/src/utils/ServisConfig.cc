@@ -4,6 +4,7 @@
 #include <fstream>
 #include <jsoncpp/json/json.h>
 #include <cstdlib>
+#include "_auth-servisError.h"
 
 
 
@@ -17,7 +18,9 @@ configdb::ServisConfig::ServisConfig(const std::string& path){
         std::ifstream::binary);
     if(!file.is_open()){
 
-        throw std::runtime_error("Can't open the file");
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::ConfigModule_CantOpenFile
+        );
     }
 
     file >> data;
@@ -25,7 +28,9 @@ configdb::ServisConfig::ServisConfig(const std::string& path){
     file.close();
     
     if(data.empty()){
-        throw std::runtime_error("File is empty");
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::ConfigModule_FileIsEmpty
+        );
     }
 
     configPath = path;
