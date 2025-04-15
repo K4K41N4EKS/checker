@@ -44,7 +44,8 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Вы не авторизованы.";
+        err["message"] = std::string("Вы не авторизованы. (такого пользователя нет - '") +
+        std::string(username) + std::string("'");
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
         response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
