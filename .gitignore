@@ -32,4 +32,4 @@ file_upload.log
 logs
 
 #not needed script files
-update_nobuild_image_v1_1_t.sh
+auth-servis/update_nobuild_image_v1_1_t.sh
