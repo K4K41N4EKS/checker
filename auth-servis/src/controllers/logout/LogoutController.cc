@@ -26,14 +26,14 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
 
         }
     }
-    catch(const std::exception& e)
+    catch(const authServisErrors::AuthServisException& e)
     {
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
         return;
@@ -51,14 +51,14 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         username = getUsernameFromToken(refresh_t);
 
     }
-    catch(const std::exception& e){
+    catch(const authServisErrors::AuthServisException& e){
 
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
         return;
@@ -111,13 +111,13 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         resp["message"] = "Выход выполнен успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
-        response->setStatusCode(drogon::HttpStatusCode::k200OK);
+        response->setStatusCode(drogon::HttpStatusCode::k205ResetContent);
 
         callback(response);
 
 
     }
-    catch(const std::exception& e)
+    catch(const authServisErrors::AuthServisException& e)
     {
         std::cout << e.what() << '\n';
 
@@ -126,7 +126,7 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
         return;

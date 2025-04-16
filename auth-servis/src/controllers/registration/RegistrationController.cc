@@ -28,14 +28,14 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
 
         }
     }
-    catch(const std::exception& e)
+    catch(const authServisErrors::AuthServisException& e)
     {
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k409Conflict);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
         return;
@@ -106,19 +106,19 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         ans["message"] = "Регистрация прошла успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(ans);
-        response->setStatusCode(drogon::HttpStatusCode::k200OK);
+        response->setStatusCode(drogon::HttpStatusCode::k201Created);
         
         callback(response);
 
     }
-    catch(const std::exception& e){
+    catch(const authServisErrors::AuthServisException& e){
         
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
 

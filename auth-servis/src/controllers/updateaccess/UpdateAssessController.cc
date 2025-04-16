@@ -26,14 +26,14 @@ void UpdateAssessController::updateAccessToken(const drogon::HttpRequestPtr &req
             );
         }
     }
-    catch(const std::exception& e)
+    catch(const authServisErrors::AuthServisException& e)
     {
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
         return;
@@ -78,23 +78,19 @@ void UpdateAssessController::updateAccessToken(const drogon::HttpRequestPtr &req
         resp["message"] = "Token update successfuly";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
+        response->setStatusCode(drogon::HttpStatusCode::k201Created)
         response->addHeader("access-token", token);
         callback(response);
 
     }
-    catch(const std::exception& e)
+    catch(const authServisErrors::AuthServisException& e)
     {
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);
-
-        if(std::string(e.what()) == "Expired token lifetime"){
-
-            response->setStatusCode(drogon::HttpStatusCode::k401Unauthorized);
-        }
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
     }

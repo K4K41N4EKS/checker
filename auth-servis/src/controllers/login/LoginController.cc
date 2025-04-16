@@ -27,14 +27,14 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
 
         }
     }
-    catch(const std::exception& e)
+    catch(const authServisErrors::AuthServisException& e)
     {
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k400BadRequest);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
         return;
@@ -77,21 +77,21 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
         resp["message"] = "Вход выполнен успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
-        response->setStatusCode(drogon::HttpStatusCode::k200OK);
+        response->setStatusCode(drogon::HttpStatusCode::k201Created);
         response->addHeader("refresh-token", refreshToken);
         response->addHeader("access-token", accessToken);
 
         callback(response);
 
     }
-    catch(const std::exception& e){
+    catch(const authServisErrors::AuthServisException& e){
         
         Json::Value err;
         err["status"] = "error";
         err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
 

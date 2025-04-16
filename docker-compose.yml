@@ -2,7 +2,7 @@ version: '3'
 
 services:
   auth-for-check-app:
-    image: dipsomask/auth-for-check-app:nobuild
+    image: dipsomask/auth-for-check-app:nobuild_1_1_t
     ports:
       - "3333:3333"
     networks:
