@@ -36,7 +36,7 @@ void _database::database::q_registration_insert(std::string userid, std::string 
     catch(const std::exception &e)
     {
         throw authServisErrors::AuthServisException(
-            authServisErrors::ErrorCode::DatabaseModule_pqxxError
+            authServisErrors::ErrorCode::RegistrationModule_UsernameIsAlreadyTaken
         );
     }
     catch(const authServisErrors::AuthServisException& e)
