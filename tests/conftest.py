@@ -1,6 +1,6 @@
 import requests
 import pytest
-from src.python.database.database import SessionLocal
+from .src.python.database.database import SessionLocal
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from src.python.models.user import User
