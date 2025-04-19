@@ -12,7 +12,7 @@ from src.python.database.database import SessionLocal
 from src.python.models.operation import Operation, OperationStatus
 from src.python.utils.logger_utils import get_logger
 from src.python.services.template_services import get_templates, get_template_by_id
-from src.python.utils.document_analyzer import check_document_format
+from python.utils.document_analyzer.core import check_document_format
 
 logger = get_logger("services.file_services")
 
