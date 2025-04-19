@@ -1,6 +1,6 @@
 #include "UpdateAssessController.h"
 #include "ServisConfig.h"
-#include "_auth-servisError.h"
+#include "_database.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -50,24 +50,8 @@ void UpdateAssessController::updateAccessToken(const drogon::HttpRequestPtr &req
         configdb::ServisConfig servisCfg = 
             configdb::ServisConfig(std::string(getenv("AUTH_SERVIS_DB_DIR")));
 
-
-        pqxx::connection conn(servisCfg.getConnectionArgs());
-        pqxx::work userExistenceCheck_Txn(conn);
-
-        auto result = userExistenceCheck_Txn.exec(
-            "SELECT * FROM users WHERE username = " + 
-            userExistenceCheck_Txn.quote(username) +
-            " AND refresh_token = " + 
-            userExistenceCheck_Txn.quote(refreshToken) + ";"
-        );
-        if(result.empty()){
-
-            throw authServisErrors::AuthServisException(
-                authServisErrors::ErrorCode::UpdateAccessModule_UnregisteredRefreshToken
-            );
-        
-        }
-        userExistenceCheck_Txn.commit();
+        _database::database db;
+        db.q_updateaccess_select_username_and_refresh(username, refreshToken);
 
         validateRefreshToken(refreshToken);
 
@@ -78,7 +62,7 @@ void UpdateAssessController::updateAccessToken(const drogon::HttpRequestPtr &req
         resp["message"] = "Token update successfuly";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
-        response->setStatusCode(drogon::HttpStatusCode::k201Created)
+        response->setStatusCode(drogon::HttpStatusCode::k201Created);
         response->addHeader("access-token", token);
         callback(response);
 

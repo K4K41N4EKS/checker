@@ -34,9 +34,10 @@ enum class ErrorCode{
     ConfigModule_FileIsEmpty,
     AuthModule_ExpiredTokenLifetime,
     AuthModule_CantGenerateToken,
-    AuthModule_UserNotFound
+    AuthModule_UserNotFound,
+    DatabaseModule_pqxxError
 
-}
+};
 
 const char * errorCodeToString(ErrorCode code);
 
@@ -52,8 +53,8 @@ public:
 
     const char* what() const noexcept override;
 
-    drogon::HttpStatusCode ToDrogonHttpErrorCode();
+    drogon::HttpStatusCode ToDrogonHttpErrorCode() const;
 
-}
+};
 
 }

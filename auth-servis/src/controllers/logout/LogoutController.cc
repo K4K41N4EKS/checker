@@ -1,6 +1,6 @@
 #include "LogoutController.h"
 #include "ServisConfig.h"
-#include "_auth-servisError.h"
+#include "_database.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -68,41 +68,12 @@ void LogoutController::logout(const drogon::HttpRequestPtr &req,
     try
     {
         // проверка наличия пользователя в бд и залогинен ли он
-        configdb::ServisConfig servisCfg = 
-            configdb::ServisConfig(std::string(getenv("AUTH_SERVIS_DB_DIR")));
-
-
-        pqxx::connection conn(servisCfg.getConnectionArgs());
-        
-        pqxx::work userExistenceAndLoginedCheck_Txn(conn);
-        auto result = userExistenceAndLoginedCheck_Txn.exec(
-            "SELECT * FROM users WHERE username = " + 
-            userExistenceAndLoginedCheck_Txn.quote(username) + 
-            " AND refresh_token = " +
-            userExistenceAndLoginedCheck_Txn.quote(refresh_t) + ";"
-        );
-        if (result.empty()) {
-            throw authServisErrors::AuthServisException(
-                authServisErrors::ErrorCode::LogoutModule_UnauthorizedUser
-            );
-        }
-        userExistenceAndLoginedCheck_Txn.commit();
+        _database::database db;
+        db.q_logout_select_username_and_refresh(username, refresh_t);
 
 
         // завершение сессии польз. удалением рефреш и ацесс токенов из БД
-        pqxx::work update_txn(conn);
-        auto new_result = update_txn.exec(
-            "UPDATE users SET access_token = '', "
-            "refresh_token = '' WHERE username = " + 
-            update_txn.quote(username) + " AND refresh_token = " +
-            update_txn.quote(refresh_t) + ";"
-        );
-        if (result.empty()) {
-            throw authServisErrors::AuthServisException(
-                authServisErrors::ErrorCode::LogoutModule_CantDeleteTokens
-            );
-        }
-        update_txn.commit();
+        db.q_logout_update(username, refresh_t);
 
 
         // отправка ответа об успешном выходе из сессии польз.

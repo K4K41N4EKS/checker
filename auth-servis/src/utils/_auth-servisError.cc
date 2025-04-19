@@ -44,6 +44,8 @@ const char * authServisErrors::errorCodeToString(ErrorCode code){
         return "Заполните все поля для входа.";
     case ErrorCode::LoginModule_IncorrectSignInData: 
         return "Неверные данные для входа.";
+    case ErrorCode::DatabaseModule_pqxxError: 
+        return "Внутренняя ошибка сервиса (x20).";
     
     default: return "Неизвестная ошибка.";
     }
@@ -57,31 +59,31 @@ authServisErrors::AuthServisException::AuthServisException(ErrorCode _code_){
 
 }
 
-authServisErrors::ErrorCode authServisErrors::AuthServisException::codeValue() const{
+authServisErrors::ErrorCode authServisErrors::AuthServisException::codeValue() const noexcept{
 
     return code;
 
 }
 
-const char* authServisErrors::AuthServisException::what() const{
+const char* authServisErrors::AuthServisException::what() const noexcept{
 
     return message.c_str();
 
 }
 
-drogon::HttpStatusCode authServisErrors::AuthServisException::ToDrogonHttpErrorCode(){
+drogon::HttpStatusCode authServisErrors::AuthServisException::ToDrogonHttpErrorCode() const{
 
-    if(code > 0 && code < 5){
+    if(static_cast<int>(code) > 0 && static_cast<int>(code) < 5){
 
         return drogon::HttpStatusCode::k400BadRequest;
     
     }
-    else if(code > 4 && code < 9){
+    else if(static_cast<int>(code) > 4 && static_cast<int>(code) < 9){
 
         return drogon::HttpStatusCode::k401Unauthorized;
 
     }
-    else if(code > 8 && code < 15){
+    else if(static_cast<int>(code) > 8 && static_cast<int>(code) < 15){
 
         return drogon::HttpStatusCode::k409Conflict;
 

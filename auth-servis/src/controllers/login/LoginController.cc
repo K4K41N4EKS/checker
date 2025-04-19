@@ -1,6 +1,6 @@
 #include "LoginController.h"
 #include "ServisConfig.h"
-#include "_auth-servisError.h"
+#include "_database.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -47,27 +47,8 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
     try{
 
 
-        configdb::ServisConfig servisCfg = 
-            configdb::ServisConfig(std::string(getenv("AUTH_SERVIS_DB_DIR")));
-
-
-        pqxx::connection conn(servisCfg.getConnectionArgs());
-        pqxx::work userExistenceHisDataCorrectCheck_Txn(conn);
-
-        auto result = userExistenceHisDataCorrectCheck_Txn.exec(
-            "SELECT * FROM users WHERE username = " + 
-            userExistenceHisDataCorrectCheck_Txn.quote(username) + 
-            " AND password_hash = " +
-            userExistenceHisDataCorrectCheck_Txn.quote(drogon::utils::getSha256(passwd)) + ";"
-        );
-        if (result.empty()) {
-
-            throw authServisErrors::AuthServisException(
-                authServisErrors::ErrorCode::LoginModule_IncorrectSignInData
-            );
-        
-        }
-        userExistenceHisDataCorrectCheck_Txn.commit();
+        _database::database db;
+        db.q_login_select(username, passwd);
 
         std::string refreshToken = generateAndCommitRefreshToken(username);
         std::string accessToken = generateAndCommitAccessToken(username);

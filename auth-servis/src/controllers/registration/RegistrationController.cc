@@ -1,6 +1,6 @@
 #include "RegistrationController.h"
 #include "ServisConfig.h"
-#include "_auth-servisError.h"
+#include "_database.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -53,22 +53,8 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
             configdb::ServisConfig(std::string(getenv("AUTH_SERVIS_DB_DIR")));
 
 
-        pqxx::connection conn(servisCfg.getConnectionArgs());
-        pqxx::work addNewStringToUsersTable_Txn(conn);
-
-        auto result = addNewStringToUsersTable_Txn.exec(
-            "INSERT INTO users (user_id, username, password_hash) VALUES (" + 
-            addNewStringToUsersTable_Txn.quote(user_id) + ", " +
-            addNewStringToUsersTable_Txn.quote(username) + ", " +
-            addNewStringToUsersTable_Txn.quote(drogon::utils::getSha256(passwd)) + ")"
-        );
-        if (!result.empty()) {
-            throw authServisErrors::AuthServisException(
-                authServisErrors::ErrorCode::RegistrationModule_UsernameIsAlreadyTaken
-            );
-        }
-        addNewStringToUsersTable_Txn.commit();
-
+        _database::database db;
+        db.q_registration_insert(user_id, username, passwd);
         
         
         cpr::Response resp = cpr::Post(
@@ -80,19 +66,8 @@ void RegistrationController::registration(const drogon::HttpRequestPtr &req,
         );
         if(resp.status_code != 201){
             
-            pqxx::connection conn(servisCfg.getConnectionArgs());
-            pqxx::work deleteLastAddedStringToUsersTable_Txn(conn);
-
-            auto result = deleteLastAddedStringToUsersTable_Txn.exec(
-                "DELETE FROM users WHERE user_id = " + 
-                deleteLastAddedStringToUsersTable_Txn.quote(user_id) + ";"
-            );
-            if (!result.empty()) {
-                throw authServisErrors::AuthServisException(
-                    authServisErrors::ErrorCode::RegistrationModule_CantDeleteUser
-                );
-            }
-            deleteLastAddedStringToUsersTable_Txn.commit();
+            _database::database db;
+            db.q_registration_delete(user_id);
 
             throw authServisErrors::AuthServisException(
                 authServisErrors::ErrorCode::RegistrationModule_BadRequestToMainApplication
