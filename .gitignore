@@ -30,3 +30,6 @@ auth-servis/docs
 file_actions.log
 file_upload.log
 logs
+
+#not needed script files
+auth-servis/update_nobuild_image_v2.sh

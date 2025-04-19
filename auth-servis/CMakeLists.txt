@@ -18,6 +18,8 @@ set(SRC_FILES
     src/controllers/updateaccess/UpdateAssessController.cc
     src/utils/auth.cc
     src/utils/ServisConfig.cc
+    src/utils/_auth-servisError.cc
+    src/utils/_database.cpp
 )
 
 
