@@ -14,7 +14,12 @@ def detect_marker_type(marker: str) -> str:
     return "other"
 
 def get_expected_list_level(paragraph, prev_marker_type, in_sublist, filters):
+    
     text = paragraph.text.strip()
+    
+    if not paragraph._element.xpath(".//w:numPr"):
+        return "body_text", None, False
+    
     marker = detect_marker(paragraph)
     if not marker:
         return "body_text", None, False
@@ -32,9 +37,10 @@ def get_expected_list_level(paragraph, prev_marker_type, in_sublist, filters):
         return "list_level_1", marker_type, True
 
     if in_sublist:
-        if marker_type == prev_marker_type and abs(indent_cm - indent_lvl1) < 0.2:
-            return "list_level_1", marker_type, False
-        else:
-            return "list_level_2", marker_type, True
+        if marker_type == prev_marker_type:
+            if abs(indent_cm - indent_lvl1) < 0.05:
+                return "list_level_1", marker_type, False
+            elif abs(indent_cm - indent_lvl2) < 0.2:
+                return "list_level_2", marker_type, True
+        return "body_text", None, False
 
-    return ("list_level_1" if marker else "body_text"), marker_type, False

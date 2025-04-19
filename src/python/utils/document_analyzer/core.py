@@ -4,7 +4,7 @@ from .template_parser import parse_template
 from .toc_checker import find_start_index
 from .checks.margin_check import check_margins
 from .checks.main_text_check.core import check_main_text
-
+from .checks.check_heading import check_headings
 
 def check_document_format(path: str, template_filters: dict) -> list[dict]:
     try:
@@ -22,6 +22,7 @@ def check_document_format(path: str, template_filters: dict) -> list[dict]:
 
     errors = []
     errors.extend(check_margins(doc, filters))
+    errors.extend(check_headings(doc, start_index))
     errors.extend(check_main_text(doc, filters, start_index))
 
     return errors
