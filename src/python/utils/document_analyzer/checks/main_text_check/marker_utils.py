@@ -38,9 +38,9 @@ def get_expected_list_level(paragraph, prev_marker_type, in_sublist, filters):
 
     if in_sublist:
         if marker_type == prev_marker_type:
-            if abs(indent_cm - indent_lvl1) < 0.05:
+            if abs(indent_cm - indent_lvl1) < 0.01:
                 return "list_level_1", marker_type, False
-            elif abs(indent_cm - indent_lvl2) < 0.2:
+            elif abs(indent_cm - indent_lvl2) < 0.02:
                 return "list_level_2", marker_type, True
-        return "body_text", None, False
+    return "body_text", marker_type or "other", False 
 
