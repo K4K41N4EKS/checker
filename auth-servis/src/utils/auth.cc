@@ -1,5 +1,6 @@
 #include "auth.h"
 #include "ServisConfig.h"
+#include "_auth-servisError.h"
 
 
 void authAndValid::IAuth::validateRefreshToken(std::string &token) {
@@ -19,8 +20,9 @@ void authAndValid::IAuth::validateRefreshToken(std::string &token) {
     verifier.verify(decoded, ec);
 
     if (ec) {
-        
-        throw std::runtime_error("Expired token lifetime");
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::AuthModule_ExpiredTokenLifetime
+        );
     }
     
 }
@@ -29,10 +31,6 @@ std::string authAndValid::IAuth::GenerateJwt(
     const std::string &username,
     const int &hours,
     const int &minutes){
-
-    if(username.empty()){
-        throw std::domain_error("User not found");
-    }
 
 
     configdb::ServisConfig servisCfg = 
@@ -58,7 +56,9 @@ std::string authAndValid::IAuth::GenerateJwt(
         );
 
     if (token.empty()) {
-        throw std::domain_error("Bad generation");
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::AuthModule_CantGenerateToken
+        );
     }
 
 
@@ -68,7 +68,9 @@ std::string authAndValid::IAuth::GenerateJwt(
 std::string authAndValid::IAuth::generateAndCommitAccessToken(const std::string &username){
     
     if(username.empty()){
-        throw std::domain_error("User not found");
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::AuthModule_UserNotFound
+        );
     }
 
 
@@ -83,17 +85,21 @@ std::string authAndValid::IAuth::generateAndCommitAccessToken(const std::string 
 
 
     pqxx::connection conn(servisCfg.getConnectionArgs());
-    pqxx::work txn(conn);
+    pqxx::work updateAccessTokenToUser_Txn(conn);
 
-    auto result = txn.exec(
-        "UPDATE users SET access_token = " + txn.quote(token) +
-        " WHERE username = " + txn.quote(username) + ";"
+    auto result = updateAccessTokenToUser_Txn.exec(
+        "UPDATE users SET access_token = " + 
+        updateAccessTokenToUser_Txn.quote(token) +
+        " WHERE username = " + 
+        updateAccessTokenToUser_Txn.quote(username) + ";"
     );
     if (!result.empty()) {
-        txn.commit();
-        throw std::runtime_error("Unexpected result from Update query");
+        updateAccessTokenToUser_Txn.commit();
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::AuthModule_CantUpdateUsersTableWithAccessToken
+        );
     }
-    txn.commit();
+    updateAccessTokenToUser_Txn.commit();
 
     return token;
 
@@ -102,7 +108,9 @@ std::string authAndValid::IAuth::generateAndCommitAccessToken(const std::string 
 std::string authAndValid::IAuth::generateAndCommitRefreshToken(const std::string &username){
     
     if(username.empty()){
-        throw std::domain_error("User not found");
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::AuthModule_UserNotFound
+        );
     }
 
 
@@ -117,17 +125,21 @@ std::string authAndValid::IAuth::generateAndCommitRefreshToken(const std::string
 
 
     pqxx::connection conn(servisCfg.getConnectionArgs());
-    pqxx::work txn(conn);
+    pqxx::work updateRefreshTokenToUser_Txn(conn);
 
-    auto result = txn.exec(
-        "UPDATE users SET refresh_token = " + txn.quote(token) +
-        " WHERE username = " + txn.quote(username) + ";"
+    auto result = updateRefreshTokenToUser_Txn.exec(
+        "UPDATE users SET refresh_token = " + 
+        updateRefreshTokenToUser_Txn.quote(token) +
+        " WHERE username = " + 
+        updateRefreshTokenToUser_Txn.quote(username) + ";"
     );
     if (!result.empty()) {
-        txn.commit();
-        throw std::runtime_error("Unexpected result from Update query");
+        updateRefreshTokenToUser_Txn.commit();
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::AuthModule_CantUpdateUsersTableWithRefreshToken
+        );
     }
-    txn.commit();
+    updateRefreshTokenToUser_Txn.commit();
 
     return token;
 
@@ -137,6 +149,16 @@ std::string authAndValid::IAuth::getUsernameFromToken(std::string token){
 
     jwt::decoded_jwt decoded = jwt::decode(token);
     
-    return decoded.get_subject();
-
+    try
+    {
+        std::string username = decoded.get_subject();
+        return username;
+    }
+    catch(const std::exception& e)
+    {
+        throw authServisErrors::AuthServisException(
+            authServisErrors::ErrorCode::AuthModule_UsernameClaimIsEmpty
+        );
+    }
+    
 }

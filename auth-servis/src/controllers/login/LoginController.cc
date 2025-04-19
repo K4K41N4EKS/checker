@@ -1,5 +1,6 @@
 #include "LoginController.h"
 #include "ServisConfig.h"
+#include "_database.h"
 
 #include <drogon/drogon.h>
 #include <jsoncpp/json/json.h>
@@ -12,45 +13,42 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
     
     auto headers = (*req).getHeaders();
         
-    if(headers.empty() || headers.find("username") == headers.end() || 
-    headers.find("passwd") == headers.end() || 
-    headers["username"].empty() || headers["passwd"].empty()){
+    try
+    {
+        if(headers.empty() || 
+            headers.find("username") == headers.end() || 
+            headers.find("passwd") == headers.end() || 
+            headers["username"].empty() || headers["passwd"].empty() ||
+            headers["username"] == "" || headers["passwd"] == ""){
         
+            throw authServisErrors::AuthServisException(
+                authServisErrors::ErrorCode::LoginModule_IncompleteData
+            );
+
+        }
+    }
+    catch(const authServisErrors::AuthServisException& e)
+    {
         Json::Value err;
         err["status"] = "error";
-        err["message"] = "Заполните все поля для входа.";
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k400BadRequest);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
         return;
-
     }
+    
 
     std::string username = headers["username"];
     std::string passwd = headers["passwd"];
-    std::cout << "\n" << drogon::utils::getSha256(passwd) << "\n";
 
     try{
 
 
-        configdb::ServisConfig servisCfg = 
-            configdb::ServisConfig(std::string(getenv("AUTH_SERVIS_DB_DIR")));
-
-
-        pqxx::connection conn(servisCfg.getConnectionArgs());
-        pqxx::work txn(conn);
-
-        auto result = txn.exec(
-            "SELECT * FROM users WHERE username = " + 
-            txn.quote(username) + " AND password_hash = " +
-            txn.quote(drogon::utils::getSha256(passwd)) + ";"
-        );
-        if (result.empty()) {
-            throw std::runtime_error("Неверные данные для входа.");
-        }
-        txn.commit();
+        _database::database db;
+        db.q_login_select(username, passwd);
 
         std::string refreshToken = generateAndCommitRefreshToken(username);
         std::string accessToken = generateAndCommitAccessToken(username);
@@ -60,21 +58,21 @@ void LoginController::login(const drogon::HttpRequestPtr &req,
         resp["message"] = "Вход выполнен успешно.";
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(resp);
-        response->setStatusCode(drogon::HttpStatusCode::k200OK);
+        response->setStatusCode(drogon::HttpStatusCode::k201Created);
         response->addHeader("refresh-token", refreshToken);
         response->addHeader("access-token", accessToken);
 
         callback(response);
 
     }
-    catch(const std::exception& e){
+    catch(const authServisErrors::AuthServisException& e){
         
         Json::Value err;
         err["status"] = "error";
-        err["message"] = std::string(e.what());
+        err["message"] = e.what();
 
         auto response = drogon::HttpResponse::newHttpJsonResponse(err);
-        response->setStatusCode(drogon::HttpStatusCode::k500InternalServerError);
+        response->setStatusCode(e.ToDrogonHttpErrorCode());
         
         callback(response);
 
