@@ -1,12 +1,18 @@
 body{
-    font-family: 'Roboto', sans-serif; /* Шрифт */
-    overflow-x:clip; /* Блокировка горизонтальной прокрутки */
-    cursor: auto; /* Изменение курсора (стоит стандартный) */
+    font-family: 'Roboto', sans-serif;
+    overflow-x:clip;
+    cursor: auto;
     margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-hr{
+header{
+    display: flex;
+    align-items: center;
     border: none;
+    justify-content: space-between; 
     background-color: black;
     color: black;
     height: 60px;
@@ -14,101 +20,351 @@ hr{
     padding: 0;
 }
 
+footer{
+    border: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: black;
+    color: gray;
+    height: 120px;  
+    margin: 0;
+    padding: 0;
+}
+
 .table {
-    width: 100%; /* Ширина таблицы 100% */
-    padding: 10px; /* Отступы */
+    width: 100%;
+    padding: 10px;
+}
+
+body::selection {
+    background-color: black;
+    color: white;
 }
 
 .table-container {
-    display: flex; /* Позиционирование таблиц */
-    width: 100%; /* Занимает всю ширину */
+    display: flex; 
+    width: 100%; 
+    justify-content: flex-start;
+    margin: 0; 
+    font-size: 20px; 
+    font-weight: 700;
+    padding-right: 20px; 
 }
 
-.table-container-left {
-    flex: 0 0 50%; /* Занимает 50% ширины */
-    justify-content: flex-start; /* Выравнивание по левому краю */
-    margin: 0; /* Отступ */
-    height: 700px; /* Высота на весь экран */
-    font-size: 20px; /* Размер шрифта */
-    font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
-    margin-right: 20px; /* Отступ справа */
+.table-container.left {
+    flex: 0 0 50%; 
+    height: 600px; 
 }
 
-.table-container-right {
-    flex: 1; /* Занимает оставшуюся ширину */
-    justify-content: flex-start; /* Выравнивание по левому краю */
-    margin: 0; /* Убираем отступы */
-    height:700px; /* Высота на весь экран */
-    font-size: 20px; /* Размер шрифта */
-    font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
-    padding-right: 20px; /* Отступ справа */
+.table-container.right {
+    flex: 1; 
 }
 
 .file-container {
-  display: flex; /* Выравнивание элементов */
-  align-items: center; /* Центрирование по вертикали */
-  gap: 10px; /* Промежуток между элементами */
-  justify-content: flex-start; /* Элементы выравниваются по началу */
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    justify-content: flex-start;
 }
 
 .start-button-container{
-  display: flex; /* Объекты в столбик*/
-  justify-content: center; /* Центрирование содержимого */
-  padding: 10px 20px; /* Отступы */
+    display: flex;
+    justify-content: center; 
+    padding: 10px 20px;
+  
 }
 
 .start-button{
-  /*border: 2px solid black;*/ /* Рамка */
-  background-color: black; /* Цвет заднего фона */
-  color: white; /* Цвет текста */
-  border-radius: 5px; /* Закругление кнопки */
-  font-size: 20px; /* Размер текста */
-  font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
-  width: 150px; /* Ширина */
-  height: 40px; /* Высота */
-  /* box-shadow: 2px 2px 2px gray;/* /* Тень */
+    display: inline-block;
+    background-color: black;
+    color: white; 
+    border-radius: 5px; 
+    font-size: 20px;
+    font-weight: 700; 
+    white-space: normal; 
+    word-wrap: break-word;
+    text-align: center;
+    margin: 0 10px;
+    min-width: 250px;
+    min-height: 50px;
+    padding: 10px 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
-.description{
-    margin-top: 12px; /* Отступ */
-    height: 12px; /* Высота */
-    display: flex; /* Центрирование */
-    justify-content: center; /* Центрирование */
+button:hover {
+    transform: scale(1.1);
+}
+
+.description, .selectedTitle{
+    margin-top: 8px; 
+    height: 16px; 
+    display: flex; 
+    justify-content: center; 
 }
 
 table {
-    width: 100%; /* Ширина */
-    border-collapse: collapse; /* Убирать пробелы между ячейками */
-    table-layout: fixed; /* Фиксированная ширина колонок */
+    width: 100%; 
+    border-collapse: collapse;
+    table-layout: fixed; 
+    margin: 20px 0;
 }
 
 th, td {
-    border: 2px solid black; /* Рамка */
-    padding: 8px; /* Отступ */
-    text-align: left; /* Выравнивание */
-    overflow: hidden; /* Скрыть переполнение текста */
-    text-overflow: ellipsis; /* Добавить многоточие для переполненного текста */
-    white-space: nowrap; /* Запретить перенос текста */
+    border: 2px solid black; 
+    padding: 8px; 
+    text-align: left; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    line-height: 1.5;
 }
 
 th {
-    background-color: #f2f2f2; /* Цвет фона */
+    background-color: #f2f2f2;
 }
 
 select {
-    border: none; /* Убрать рамку */
-    background-color: #f0f0f0; /* Цвет фона */
-    padding: 10px; /* Отступы */
-    border-radius: 5px; /* Закругление */
-    outline: none; /* Убрать обводку при фокусе */
-    font-weight: 700; /* Жирный текст (400 - обычный, 700 - жирный) */
-    cursor: pointer; /* Указатель при наведении */
-    font-size: 20px; /* Размер шрифта */
-    width: 100%; /* Ширина */
+    border: none;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    outline: none;
+    font-weight: 700; 
+    cursor: pointer; 
+    font-size: 20px; 
+    width: 100%;
+}
+
+.inp {
+    margin-right: 10px;
+}
+#name-input {
+    padding-right: 10px;
+    width: calc(100% - 25px);
+    height: 40px;
+    font-size: 20px;
+    margin-left: 10px;
+    
 }
 
 select:focus {
-    outline: none; /* Убрать обводку при фокусе */
-    cursor: pointer; /* Указатель при наведении */
+    outline: none;
+    cursor: pointer;
     
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#checker {
+    align-items: center;
+    text-align: left;
+    margin-left: 10px;
+    color: white;
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#checker::after, #checker-footer::after {
+    content: '\2611';
+}
+
+#footer-phone::before {
+    content: '\260E';
+}
+
+#footer-email::before {
+    content: '\2709';
+}
+
+.header {
+    color: white;
+    margin: 20px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    
+}
+
+.footer {
+    color: grey;
+    margin: 20px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    
+}
+
+#header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+iframe {
+    width: 100%;
+    height: 1000px;
+}
+
+.footer-left {
+    display: flex;
+    flex-direction: row;
+    text-align: left;
+    margin: 20px;
+}
+
+.footer-right {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    margin: 10px;
+}
+
+.container{
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    text-align: center;
+}
+
+.text-main{
+    font-size: 20px; 
+}
+
+.file-container {
+    display: flex; 
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-start; 
+}
+
+.file-button{
+    border: 2px solid black;
+    border-radius: 5px; 
+    font-size: 25px; 
+    width: 400px;
+    height: 60px;
+    display: inline-block;
+    text-align: center; 
+    line-height: 60px;
+    cursor: pointer; 
+    font-weight: 700; 
+  
+
+}
+
+#fileInput{
+    display: none; 
+  
+}
+
+#fileName{
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.start-button-container{
+    display: flex; 
+    justify-content: center;
+    padding: 10px 20px;
+}
+
+.button-new{
+    display: inline-block;
+    overflow-wrap: break-word;
+    white-space: normal;
+    min-height: 45px;
+    width: 500px;
+    font-size: 30px;
+    border-radius: 15px;
+    background-color: white;
+    border: 3px solid black;
+    margin-bottom: 9px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    
+}
+
+.template-display__button-container{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+.button-container{
+    display: inline-block;
+    height: 45px;
+    width: 70px;
+    font-size: 30px;
+    border-radius: 15px;
+    background-color: white;
+    border: 3px solid black;
+    margin-bottom: 9px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    
+}
+
+.template-display{
+    display: flex;
+    flex-direction: column;
+  
+}
+
+.download-file{
+    margin-top: 150px; 
+}
+
+#progressContainer{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+}
+
+#progressBar{
+    width: 600px;
+    height: 40px;
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+#progressBar::-webkit-progress-value {
+    background-color: black;
+    border-radius: 7px;
+}
+
+#progressBar::-webkit-progress-bar {
+    background-color: white;
+    border-radius: 7px;
+}
+
+#progressText{
+    font-size: 30px;
+    margin-left: 10px;
+}
+
+#downloadButton{
+    display: inline-block;
+    background-color: black;
+    color: white; 
+    border-radius: 5px;
+    font-size: 20px; 
+    font-weight: 700; 
+    white-space: normal; 
+    word-wrap: break-word;
+    text-align: center;
+    margin: 10px;
+    min-width: 250px;
+    min-height: 50px;
+    padding: 10px 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }

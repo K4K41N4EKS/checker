@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel='stylesheet' href='settings-style.css'>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>Шаблоны</title>
+</head>
+<body>  
+  <header>
+        <a id="checker" href="sample.html">Checker GOST </a>
+        <div id="header"> 
+            <a class="header" href="sample.html">Главная</a>
+            <a class="header" href="#">О нас</a>
+            <a class="header" target="_blank" href="gostTUSUR.html">Официальный ГОСТ ТУСУР</a>
+        </div>
+    </header>
+  <main>
+    <div class="container">
+        <div class="text-main">
+            <h1>Доступные шаблоны:</h1>
+        </div>
+        <div class="template-display" id="button-new">
+            
+            <div class="template-display__button-container">
+                <button class="button-new" onclick="hrefFuncNotSample()">+ Добавить шаблон</button>
+            </div>
+            <div class="template-display__button-container">
+                <button class="button-new" onclick="hrefFuncSample()">Тестовый шаблон</button>
+                <button class="button-update button-container">&#9997;</button>
+                <button class="button-delete button-container" onclick="deleteTemplate(templateId)">&#128465;</button>
+            </div>
+        </div>
+    </div>
+  </main>
+  <footer>
+        <div class="footer-left">
+            <p id="checker-footer">Checker GOST </p>
+            <a class="footer" href="sample.html">Главная</a>
+            <a class="footer" href="#">О нас</a>
+            <a class="footer" target="_blank" href="gostTUSUR.html">Официальный ГОСТ ТУСУР</a>
+        </div>
+        <div class="footer-right">
+            <p id="footer-phone"> +7(952)159-02-56</p>
+            <p id="footer-email"> saharovandy@yandex.ru</p>
+        </div>
+    </footer> 
+  
+    <script src="button.js"></script>
+</body>
+</html>
