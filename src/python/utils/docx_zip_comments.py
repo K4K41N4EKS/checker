@@ -30,7 +30,7 @@ def add_comments_to_docx_batch(docx_path: str, comments: list[dict], inplace: bo
             root = etree.Element(qn('w:comments'), nsmap={'w': NAMESPACES['w']})
             etree.ElementTree(root).write(comments_xml, xml_declaration=True, encoding='UTF-8', standalone='yes')
 
-        # Парсинг
+            # Парсинг
         doc_tree = etree.parse(document_xml)
         doc_root = doc_tree.getroot()
         paragraphs = doc_root.xpath('//w:body/w:p', namespaces=NAMESPACES)

@@ -17,12 +17,10 @@ def check_page_numbering(path: str) -> list[dict]:
         for footer in [section.footer, section.first_page_footer, section.even_page_footer]:
             xml = footer._element.xml
 
-            # Простой поиск: <w:fldSimple w:instr=" PAGE ">
             if 'w:fldSimple' in xml and 'PAGE' in xml:
                 has_numbering = True
                 break
-
-            # Поиск через lxml xpath без аргумента namespaces
+            
             tree = etree.fromstring(xml.encode('utf-8'))
             instr_texts = tree.findall(".//{%s}instrText" % WORD_NAMESPACE)
             if any("PAGE" in instr.text for instr in instr_texts if instr.text):
