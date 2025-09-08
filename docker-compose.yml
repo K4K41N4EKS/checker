@@ -19,9 +19,9 @@ services:
   postgres-auth:
     image: postgres:latest
     environment:
-      - POSTGRES_USER=${PUSTGRES_AUTH_DB_USER}
-      - POSTGRES_PASSWORD=${PUSTGRES_AUTH_DB_PASSWORD}
-      - POSTGRES_DB=${PUSTGRES_AUTH_DB_DATABASE}
+      - POSTGRES_USER=${POSTGRES_AUTH_DB_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_AUTH_DB_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_AUTH_DB_DATABASE}
     env_file:
       - .env
     volumes:
@@ -50,7 +50,7 @@ services:
     networks:
       - checker-network
 
-  api:
+  checker_backend:
     build:
       context: .
       dockerfile: Dockerfile
@@ -70,15 +70,17 @@ services:
     networks:
       - checker-network
     
-  web-server-node:
+  frontend:
     build:
       context: .
-      dockerfile: expres-server.dockerfile
+      dockerfile: frontend.dockerfile
     ports:
-      - "3001:3001"
+      - "80:80"
     networks:
       - checker-network
-    container_name: web-server-node
+    container_name: checker_frontend
+    depends_on:
+      - checker_backend
 
 
 networks:
