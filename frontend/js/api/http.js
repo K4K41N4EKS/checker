@@ -57,8 +57,8 @@ function defaultUnauthorizedHandler() {
   try { clearCurrentUser(); } catch {}
   try { showNotification("Сессия истекла. Пожалуйста, войдите снова.", "warning"); } catch {}
   try { window.dispatchEvent(new Event("app:unauthorized")); } catch {}
-  try { if (location && location.hash) { history.replaceState(null, "", location.pathname + location.search); } } catch {}
 }
 export default apiFetch;
+
 
 

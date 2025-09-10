@@ -28,14 +28,17 @@ export function showAuthenticatedUI(username) {
   if (u) u.textContent = username || '';
 }
 
+function setActiveNav(pageName) {
+  document.querySelectorAll('.nav-link').forEach((l) => l.classList.remove('active'));
+  const active = document.querySelector(`[data-page="${pageName}"]`);
+  if (active) active.classList.add('active');
+}
+
 export function showPage(pageName, loaders = {}) {
   hideAllPages();
   const p = document.getElementById(`${pageName}-page`);
   if (p) p.classList.add('active');
-
-  document.querySelectorAll('.nav-link').forEach((l) => l.classList.remove('active'));
-  const active = document.querySelector(`[data-page="${pageName}"]`);
-  if (active) active.classList.add('active');
+  setActiveNav(pageName);
 
   if (pageName === 'dashboard' && loaders.loadDashboard) loaders.loadDashboard();
   if (pageName === 'templates' && loaders.loadTemplates) loaders.loadTemplates();

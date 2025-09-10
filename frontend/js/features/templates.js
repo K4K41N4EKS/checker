@@ -212,6 +212,14 @@ function collectFiltersFromForm() {
     first_line_indent: Number(val('table-indent')),
     line_spacing: Number(val('table-spacing')),
   };
+  // New: text inside table cells
+  filters.table_cell_text = {
+    font_name: val('tablecell-font'),
+    font_size: Number(val('tablecell-size')),
+    alignment: val('tablecell-alignment'),
+    first_line_indent: Number(val('tablecell-indent')),
+    line_spacing: Number(val('tablecell-spacing')),
+  };
   return filters;
 }
 
@@ -298,5 +306,13 @@ export function populateTemplateForm(template) {
     if (tb.alignment) document.getElementById('table-alignment').value = tb.alignment;
     if (tb.first_line_indent !== undefined) document.getElementById('table-indent').value = tb.first_line_indent;
     if (tb.line_spacing !== undefined) document.getElementById('table-spacing').value = tb.line_spacing;
+  }
+  if (f.table_cell_text) {
+    const tc = f.table_cell_text;
+    if (tc.font_name) document.getElementById('tablecell-font').value = tc.font_name;
+    if (tc.font_size) document.getElementById('tablecell-size').value = tc.font_size;
+    if (tc.alignment) document.getElementById('tablecell-alignment').value = tc.alignment;
+    if (tc.first_line_indent !== undefined) document.getElementById('tablecell-indent').value = tc.first_line_indent;
+    if (tc.line_spacing !== undefined) document.getElementById('tablecell-spacing').value = tc.line_spacing;
   }
 }
