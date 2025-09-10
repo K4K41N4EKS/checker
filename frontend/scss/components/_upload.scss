@@ -1,0 +1,14 @@
+/* Upload */
+.upload-container { max-width: 800px; margin: 0 auto; }
+.upload-card { background: var(--color-surface); color: var(--color-text); padding: var(--space-8); border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); text-align: center; }
+.upload-area { border: 3px dashed var(--color-brand-500); border-radius: var(--radius-lg); padding: 60px 20px; margin-bottom: var(--space-7); transition: all .3s ease; }
+.upload-area.dragover { border-color: var(--color-brand-600); background: rgba(102,126,234,.05); }
+.upload-area i { font-size: 4rem; color: var(--color-brand-500); margin-bottom: var(--space-5); }
+.upload-area h3 { font-size: 1.5rem; margin-bottom: var(--space-3); color: var(--color-text); }
+.upload-area p { color: var(--color-text-muted); margin-bottom: var(--space-4); }
+.template-selection { margin-bottom: var(--space-7); text-align: left; }
+.template-selection h3 { margin-bottom: var(--space-4); color: var(--color-text); }
+.upload-actions { display: flex; gap: var(--space-4); justify-content: center; }
+
+
+

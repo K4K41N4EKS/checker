@@ -1,0 +1,42 @@
+/* Fun micro-animations and subtle effects (no framework) */
+
+/* Background uses the app gradient from CSS variables.
+   Extra ambient overlays removed by request. */
+
+/* Ensure app layer context (no overlays) */
+#app { position: relative; z-index: 1; }
+
+/* Card pop-in and gentle hover float */
+.auth-card { animation: cardIn .6s cubic-bezier(.2,.8,.2,1); }
+.auth-card:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,.25); }
+@keyframes cardIn { from { opacity: 0; transform: translateY(15px) scale(.98);} to {opacity:1; transform: translateY(0) scale(1);} }
+
+/* Buttons: glow and press feedback */
+.btn-primary { box-shadow: 0 6px 16px rgba(7,160,64,.25); }
+.btn-primary:hover { box-shadow: 0 10px 28px rgba(7,160,64,.35); transform: translateY(-3px) scale(1.01); }
+.btn:active { transform: translateY(0) scale(.99); filter: saturate(110%); }
+
+/* Inputs: soft focus ring */
+.form-group input:focus, .form-group select:focus, .form-select:focus {
+  box-shadow: 0 0 0 3px rgba(7,160,64,.18), 0 8px 24px rgba(0,0,0,.25);
+}
+
+/* Navbar: glass look and slide-in on mount */
+.navbar { backdrop-filter: blur(12px) saturate(120%); animation: slideDown .5s ease; }
+@keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* Pages: enhance built-in fade with slight parallax */
+.page.active { animation: fadeIn .5s ease, pageLift .6s ease; }
+@keyframes pageLift { from { transform: translateY(8px); } to { transform: translateY(0); } }
+
+/* Burger toggle playful motion */
+#nav-toggle.active span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+#nav-toggle.active span:nth-child(2) { opacity: 0; }
+#nav-toggle.active span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+#nav-toggle span { transition: transform .25s ease, opacity .25s ease; }
+
+/* Notifications: slide in */
+.notification { animation: notifyIn .35s ease; }
+@keyframes notifyIn { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* Scanner/grid overlays removed to keep clean gradient background */

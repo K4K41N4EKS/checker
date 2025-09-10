@@ -1,0 +1,19 @@
+/* Modal */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: var(--z-modal); backdrop-filter: blur(5px); }
+.modal.active { display: flex; justify-content: center; align-items: center; }
+.modal-content { background: var(--color-surface); border-radius: var(--radius-xl); max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-xl); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-5) var(--space-7); border-bottom: 1px solid var(--color-border-strong); }
+.modal-header h2 { color: var(--color-text); }
+.modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text-muted); padding: 5px; border-radius: 50%; transition: all .3s ease; }
+.modal-close:hover { background: rgba(255,255,255,.08); color: var(--color-text); }
+.modal-body { padding: var(--space-7); }
+.modal-actions { display: flex; gap: var(--space-4); justify-content: flex-end; margin-top: var(--space-7); }
+
+/* Template modal sections */
+.template-sections { max-height: 70vh; overflow-y: auto; padding-right: 10px; }
+.template-section { margin-bottom: 1.25rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px solid var(--color-border-strong); }
+.template-section h3 { margin: 0 0 .75rem; color: var(--color-text); font-size: 1.05rem; display: flex; align-items: center; gap: .5rem; }
+.template-section h3 i { color: var(--color-brand-500); }
+
+
+

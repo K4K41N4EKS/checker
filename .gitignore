@@ -33,3 +33,8 @@ logs
 
 #not needed script files
 auth-servis/update_nobuild_image_v2.sh
+
+# frontend build artifact (compiled CSS is built in container)
+frontend/css/app.css
+frontend/css/app.css.map
+frontend/node_modules/

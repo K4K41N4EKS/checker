@@ -1,0 +1,24 @@
+/* Results */
+.results-list { display: flex; flex-direction: column; gap: var(--space-4); }
+.result-item { position: relative; background: var(--color-surface); padding: var(--space-5); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); display: flex; justify-content: space-between; align-items: center; }
+.result-info h3 { color: var(--color-text); margin-bottom: var(--space-2); }
+.result-info p { color: var(--color-text-muted); font-size: .9rem; }
+.result-status { display: inline-block; padding: var(--space-2) var(--space-4); border-radius: 20px; font-size: .9rem; font-weight: 500; }
+.status-uploaded { background: var(--status-uploaded-bg); color: var(--status-uploaded-fg); }
+.status-processing { background: var(--status-processing-bg); color: var(--status-processing-fg); }
+.status-done { background: var(--status-done-bg); color: var(--status-done-fg); }
+.status-error { background: var(--status-error-bg); color: var(--status-error-fg); }
+.filter-controls { display: flex; gap: var(--space-4); align-items: center; }
+.filter-controls .form-select { width: 220px; }
+
+/* Highlight newly created operation */
+.result-item.highlight-pulse { animation: highlightPulse .4s ease-in-out 3; }
+@keyframes highlightPulse { 0% { box-shadow: 0 0 0 0 rgba(7,160,64,.0); } 50% { box-shadow: 0 0 0 6px rgba(7,160,64,.15); } 100% { box-shadow: 0 0 0 0 rgba(7,160,64,.0); } }
+
+/* Status change transitions */
+.result-status.status-out { animation: statusOut .18s ease forwards; }
+.result-status.status-in { animation: statusIn .22s ease forwards; }
+@keyframes statusOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-4px); } }
+@keyframes statusIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+

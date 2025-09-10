@@ -1,0 +1,29 @@
+/* Notifications */
+.notifications { position: fixed; top: 90px; right: 20px; z-index: var(--z-notify); }
+.notification {
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 12px 16px 12px 14px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+  animation: slideIn .3s ease-out;
+  max-width: 420px;
+  position: relative;
+  overflow: hidden;
+}
+.notification::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 5px;
+  background: var(--color-info);
+}
+.notification.success::before { background: var(--color-success); }
+.notification.error::before { background: var(--color-danger); }
+.notification.warning::before { background: var(--color-warning); }
+.notification i { font-size: 1.1rem; opacity: .9; }
+.notification span { line-height: 1.35; }
+@keyframes slideIn { from { transform: translateX(12px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+

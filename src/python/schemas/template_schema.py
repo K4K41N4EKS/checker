@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 class TemplateBase(BaseModel):
     name: str
@@ -15,6 +16,7 @@ class TemplateUpdate(BaseModel):
 class TemplateResponse(TemplateBase):
     id: str
     user_id: str
+    created_at: datetime
 
     class Config:
         model_config = {

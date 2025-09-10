@@ -1,0 +1,16 @@
+/* Layout and structural objects */
+.main-content { flex: 1; padding: var(--space-5) 0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 var(--space-5); }
+
+.page { display: none; animation: fadeIn .5s ease-in-out; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px);} to {opacity:1; transform: translateY(0);} }
+
+.page-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-7);
+  background: var(--color-surface); padding: var(--space-5); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+}
+.page-header h1 { color: var(--color-text); font-size: 2rem; display: flex; align-items: center; gap: var(--space-4); }
+.page-header p { color: var(--color-text-muted); margin-top: var(--space-2); }
+
+
