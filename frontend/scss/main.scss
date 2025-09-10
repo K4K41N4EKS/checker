@@ -1,0 +1,21 @@
+// ITCSS order: settings -> tools -> generic -> objects -> components -> utilities -> responsive
+@use 'settings/variables';
+@use 'tools/mixins';
+
+@use 'generic/base';
+@use 'objects/layout';
+
+@use 'components/navbar';
+@use 'components/buttons';
+@use 'components/auth';
+@use 'components/forms';
+@use 'components/dashboard';
+@use 'components/upload';
+@use 'components/templates';
+@use 'components/results';
+@use 'components/modal';
+@use 'components/notifications';
+
+@use 'utilities/utilities';
+
+@use 'responsive/responsive';

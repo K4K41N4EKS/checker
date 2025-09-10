@@ -3,7 +3,7 @@ import { showLoginPage, showRegisterPage, showAuthenticatedUI, showPage as route
 import { attachAuthHandlers } from './features/auth.js';
 import { attachTemplateHandlers, loadTemplates, editTemplate, deleteTemplate } from './features/templates.js';
 import { setupFileUpload } from './features/upload.js';
-import { loadResults, attachResultsHandlers, downloadFile as downloadResultFile } from './features/results.js';
+import { loadResults, attachResultsHandlers, downloadFile as downloadResultFile, highlightOperation } from './features/results.js';
 import { loadDashboard } from './features/dashboard.js';
 import { downloadFileBlob } from './api/backendApi.js';
 // Settings UI removed; single dark theme is used
@@ -40,7 +40,7 @@ function initNavigation() {
 
 function bindGlobals() {
   // Dashboard buttons rely on this
-  window.showPage = (pageName) => { routeShowPage(pageName, { loadDashboard, loadTemplates, loadResults }); location.hash = pageName; };
+  window.showPage = (pageName) => routeShowPage(pageName, { loadDashboard, loadTemplates, loadResults });
   // Card actions rely on globals
   window.editTemplate = (id) => editTemplate(id);
   window.deleteTemplate = (id) => deleteTemplate(id);
@@ -55,7 +55,9 @@ function bindGlobals() {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
-  };
+    };
+  // Helper to highlight a just-created operation
+  window.highlightOperation = (id) => highlightOperation(id);
 }
 
 function tuneNumericInputsPrecision() {
@@ -73,23 +75,7 @@ function tuneNumericInputsPrecision() {
   });
 }
 
-function setupHashRouting() {
-  function applyFromHash() {
-    const hash = (location.hash || '').replace('#', '');
-    const user = getCurrentUser();
-    if (!user) {
-      if (hash === 'register') showRegisterPage(); else showLoginPage();
-      return;
-    }
-    const allowed = ['dashboard', 'templates', 'upload', 'results'];
-    const page = allowed.includes(hash) ? hash : 'dashboard';
-    routeShowPage(page, { loadDashboard, loadTemplates, loadResults });
-    if (!hash) { try { location.hash = page; } catch {} }
-  }
-  window.addEventListener('hashchange', applyFromHash);
-  // Initial sync
-  applyFromHash();
-}
+// Hash routing removed for simplicity and to avoid conflicts.
 
 async function bootstrap() {
   const user = getCurrentUser();
@@ -106,17 +92,30 @@ async function bootstrap() {
       authState.setAccessToken(t);
     }
   } catch (_) {}
-  attachAuthHandlers({ onLoggedIn: () => { location.hash = 'dashboard'; loadDashboard(); } });
+  attachAuthHandlers({ onLoggedIn: () => { routeShowPage('dashboard', { loadDashboard, loadTemplates, loadResults }); } });
   attachTemplateHandlers();
   setupFileUpload();
   attachResultsHandlers();
   bindGlobals();
   tuneNumericInputsPrecision();
-  setupHashRouting();
+  // hash routing disabled
 }
 
-document.addEventListener('DOMContentLoaded', bootstrap);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+  // DOM already parsed (module at end of body) — init immediately
+  bootstrap();
+}
 
 
 
 
+
+
+
+// Показать форму входа по глобальному событию из http-клиента
+window.addEventListener('app:unauthorized', () => {
+  try { require('./ui/router.js'); } catch(_) {}
+  try { showLoginPage(); } catch(_) {}
+});

@@ -1,674 +1,640 @@
-<!DOCTYPE html>
-<html lang="ru">
+﻿<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>DocSentri - Проверка документов по ГОСТ</title>
-    <link rel="stylesheet" href="css/style.css?v=2">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>DocSentri — Проверка электронных документов</title>
+  <link rel="stylesheet" href="css/app.css?v=2">
+  <link rel="stylesheet" href="css/overrides.css?v=1">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="%2307a040"/><path d="M7 12l3 3 7-7" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="app">
-        <!-- Навигация -->
-        <nav class="navbar" id="navbar">
-            <div class="nav-container">
-                <div class="nav-logo">
-                    <i class="fas fa-file-check"></i>
-                    <span>DocSentri</span>
-                </div>
-                <div class="nav-menu" id="nav-menu">
-                    <a href="#dashboard" class="nav-link" data-page="dashboard">
-                        <i class="fas fa-home"></i> Главная
-                    </a>
-                    <a href="#templates" class="nav-link" data-page="templates">
-                        <i class="fas fa-file-alt"></i> Шаблоны
-                    </a>
-                    <a href="#upload" class="nav-link" data-page="upload">
-                        <i class="fas fa-upload"></i> Загрузить
-                    </a>
-                    <a href="#results" class="nav-link" data-page="results">
-                        <i class="fas fa-list"></i> Результаты
-                    </a>
-                    <div class="nav-user" id="nav-user">
-                        <span id="user-name"></span>
-                        <button class="btn-logout" id="logout-btn">
-                            <i class="fas fa-sign-out-alt"></i> Выйти
-                        </button>
-                    </div>
-                </div>
-                <div class="nav-toggle" id="nav-toggle">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Основной контент -->
-        <main class="main-content">
-            <!-- Страница входа -->
-            <div id="login-page" class="page active">
-                <div class="auth-container">
-                    <div class="auth-card">
-                        <div class="auth-header">
-                            <i class="fas fa-file-check"></i>
-                            <h1>Document Checker</h1>
-                            <p>Проверка документов по ГОСТ</p>
-                        </div>
-                        <form id="login-form" class="auth-form">
-                            <div class="form-group">
-                                <label for="login-username">Имя пользователя</label>
-                                <input type="text" id="login-username" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="login-password">Пароль</label>
-                                <input type="password" id="login-password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-sign-in-alt"></i> Войти
-                            </button>
-                        </form>
-                        <div class="auth-footer">
-                            <p>Нет аккаунта? <a href="#" id="show-register">Зарегистрироваться</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Страница регистрации -->
-            <div id="register-page" class="page">
-                <div class="auth-container">
-                    <div class="auth-card">
-                        <div class="auth-header">
-                            <i class="fas fa-user-plus"></i>
-                            <h1>Регистрация</h1>
-                            <p>Создать новый аккаунт</p>
-                        </div>
-                        <form id="register-form" class="auth-form">
-                            <div class="form-group">
-                                <label for="register-username">Имя пользователя</label>
-                                <input type="text" id="register-username" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="register-password">Пароль</label>
-                                <input type="password" id="register-password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="register-confirm">Подтвердите пароль</label>
-                                <input type="password" id="register-confirm" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-user-plus"></i> Зарегистрироваться
-                            </button>
-                        </form>
-                        <div class="auth-footer">
-                            <p>Уже есть аккаунт? <a href="#" id="show-login">Войти</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Главная страница -->
-            <div id="dashboard-page" class="page">
-                <div class="container">
-                    <div class="page-header">
-                        <h1><i class="fas fa-home"></i> Главная</h1>
-                        <p>Добро пожаловать в Document Checker</p>
-                    </div>
-                    
-                    <div class="dashboard-grid">
-                        <div class="dashboard-card">
-                            <div class="card-icon">
-                                <i class="fas fa-upload"></i>
-                            </div>
-                            <h3>Загрузить документ</h3>
-                            <p>Проверить .docx файл на соответствие ГОСТ</p>
-                            <button class="btn btn-primary" onclick="showPage('upload')">
-                                <i class="fas fa-upload"></i> Загрузить
-                            </button>
-                        </div>
-
-                        <div class="dashboard-card">
-                            <div class="card-icon">
-                                <i class="fas fa-file-alt"></i>
-                            </div>
-                            <h3>Управление шаблонами</h3>
-                            <p>Создать и настроить шаблоны проверки</p>
-                            <button class="btn btn-secondary" onclick="showPage('templates')">
-                                <i class="fas fa-cog"></i> Настроить
-                            </button>
-                        </div>
-
-                        <div class="dashboard-card">
-                            <div class="card-icon">
-                                <i class="fas fa-list"></i>
-                            </div>
-                            <h3>История проверок</h3>
-                            <p>Просмотр результатов предыдущих проверок</p>
-                            <button class="btn btn-secondary" onclick="showPage('results')">
-                                <i class="fas fa-history"></i> Просмотр
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Страница шаблонов -->
-            <div id="templates-page" class="page">
-                <div class="container">
-                    <div class="page-header">
-                        <h1><i class="fas fa-file-alt"></i> Шаблоны</h1>
-                        <button class="btn btn-primary" id="create-template-btn">
-                            <i class="fas fa-plus"></i> Создать шаблон
-                        </button>
-                    </div>
-                    
-                    <div class="templates-grid" id="templates-grid">
-                        <!-- Шаблоны будут загружены динамически -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Страница загрузки -->
-            <div id="upload-page" class="page">
-                <div class="container">
-                    <div class="page-header">
-                        <h1><i class="fas fa-upload"></i> Загрузка документа</h1>
-                        <p>Выберите .docx файл для проверки</p>
-                    </div>
-                    
-                    <div class="upload-container">
-                        <div class="upload-card">
-                            <div class="upload-area" id="upload-area">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <h3>Перетащите файл сюда</h3>
-                                <p>или</p>
-                                <button class="btn btn-primary" id="select-file-btn">
-                                    <i class="fas fa-folder-open"></i> Выбрать файл
-                                </button>
-                                <input type="file" id="file-input" accept=".docx" style="display: none;">
-                            </div>
-                            
-                            <div class="template-selection" id="template-selection" style="display: none;">
-                                <h3>Выберите шаблон</h3>
-                                <select id="template-select" class="form-select">
-                                    <option value="">Загрузка шаблонов...</option>
-                                </select>
-                            </div>
-                            
-                            <div class="upload-actions" id="upload-actions" style="display: none;">
-                                <button class="btn btn-primary" id="upload-btn" disabled>
-                                    <i class="fas fa-upload"></i> Загрузить и проверить
-                                </button>
-                                <button class="btn btn-secondary" id="cancel-upload-btn">
-                                    <i class="fas fa-times"></i> Отмена
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Страница результатов -->
-            <div id="results-page" class="page">
-                <div class="container">
-                    <div class="page-header">
-                        <h1><i class="fas fa-list"></i> Результаты проверок</h1>
-                        <div class="filter-controls">
-                            <select id="status-filter" class="form-select">
-                                <option value="">Все статусы</option>
-                                <option value="uploaded">Загружено</option>
-                                <option value="processing">Обработка</option>
-                                <option value="done">Готово</option>
-                                <option value="error">Ошибка</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="results-list" id="results-list">
-                        <!-- Результаты будут загружены динамически -->
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Модальные окна -->
-        <div id="template-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modal-title">Создать шаблон</h2>
-                    <button class="modal-close" id="modal-close">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="template-form">
-                        <div class="form-group">
-                            <label for="template-name">Название шаблона</label>
-                            <input type="text" id="template-name" required>
-                        </div>
-                        
-                        <div class="template-sections">
-                            <!-- Поля документа -->
-                            <div class="template-section">
-                                <h3><i class="fas fa-file"></i> Поля документа</h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="top-margin">Верхнее поле (см)</label>
-                                        <input type="number" id="top-margin" step="0.1" min="0" max="10" value="2">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="bottom-margin">Нижнее поле (см)</label>
-                                        <input type="number" id="bottom-margin" step="0.1" min="0" max="10" value="2">
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="left-margin">Левое поле (см)</label>
-                                        <input type="number" id="left-margin" step="0.1" min="0" max="10" value="3">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="right-margin">Правое поле (см)</label>
-                                        <input type="number" id="right-margin" step="0.1" min="0" max="10" value="1.5">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Заголовки -->
-                            <div class="template-section">
-                                <h3><i class="fas fa-heading"></i> Заголовки</h3>
-                                
-                                <div class="form-group">
-                                    <label for="start-after-heading">Начало после заголовка</label>
-                                    <input type="text" id="start-after-heading" value="Оглавление" placeholder="Оглавление">
-                                </div>
-
-                                <!-- Статические заголовки -->
-                                <div class="form-group">
-                                    <label>Статические заголовки (Введение, Заключение, Список источников)</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="static-font">Шрифт</label>
-                                            <select id="static-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="static-size">Размер (пт)</label>
-                                            <input type="number" id="static-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="static-alignment">Выравнивание</label>
-                                            <select id="static-alignment">
-                                                <option value="center">По центру</option>
-                                                <option value="left">По левому краю</option>
-                                                <option value="right">По правому краю</option>
-                                                <option value="justify">По ширине</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="static-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="static-indent" step="0.1" min="0" max="5" value="0">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="static-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="static-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Заголовки 1 уровня -->
-                                <div class="form-group">
-                                    <label>Заголовки 1 уровня (1, 2, 3...)</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="h1-font">Шрифт</label>
-                                            <select id="h1-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h1-size">Размер (пт)</label>
-                                            <input type="number" id="h1-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h1-alignment">Выравнивание</label>
-                                            <select id="h1-alignment">
-                                                <option value="center">По центру</option>
-                                                <option value="left">По левому краю</option>
-                                                <option value="right">По правому краю</option>
-                                                <option value="justify">По ширине</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="h1-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="h1-indent" step="0.1" min="0" max="5" value="0">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h1-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="h1-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>
-                                                <input type="checkbox" id="h1-all-caps" checked> Заглавные буквы
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Заголовки 2 уровня -->
-                                <div class="form-group">
-                                    <label>Заголовки 2 уровня (1.1, 1.2, 1.3...)</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="h2-font">Шрифт</label>
-                                            <select id="h2-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h2-size">Размер (пт)</label>
-                                            <input type="number" id="h2-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h2-alignment">Выравнивание</label>
-                                            <select id="h2-alignment">
-                                                <option value="center">По центру</option>
-                                                <option value="left">По левому краю</option>
-                                                <option value="right">По правому краю</option>
-                                                <option value="justify">По ширине</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="h2-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="h2-indent" step="0.1" min="0" max="5" value="0">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h2-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="h2-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>
-                                                <input type="checkbox" id="h2-all-caps"> Заглавные буквы
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Заголовки 3 уровня -->
-                                <div class="form-group">
-                                    <label>Заголовки 3 уровня (1.1.1, 1.1.2, 1.1.3...)</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="h3-font">Шрифт</label>
-                                            <select id="h3-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h3-size">Размер (пт)</label>
-                                            <input type="number" id="h3-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h3-alignment">Выравнивание</label>
-                                            <select id="h3-alignment">
-                                                <option value="center">По центру</option>
-                                                <option value="left">По левому краю</option>
-                                                <option value="right">По правому краю</option>
-                                                <option value="justify">По ширине</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="h3-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="h3-indent" step="0.1" min="0" max="5" value="0">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="h3-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="h3-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>
-                                                <input type="checkbox" id="h3-all-caps"> Заглавные буквы
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Основной текст -->
-                            <div class="template-section">
-                                <h3><i class="fas fa-paragraph"></i> Основной текст</h3>
-                                
-                                <div class="form-group">
-                                    <label>Обычный текст</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="body-font">Шрифт</label>
-                                            <select id="body-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="body-size">Размер (пт)</label>
-                                            <input type="number" id="body-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="body-alignment">Выравнивание</label>
-                                            <select id="body-alignment">
-                                                <option value="justify">По ширине</option>
-                                                <option value="left">По левому краю</option>
-                                                <option value="center">По центру</option>
-                                                <option value="right">По правому краю</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="body-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="body-indent" step="0.1" min="0" max="5" value="1.25">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="body-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="body-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Списки 1 уровня -->
-                                <div class="form-group">
-                                    <label>Списки 1 уровня</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="list1-font">Шрифт</label>
-                                            <select id="list1-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list1-size">Размер (пт)</label>
-                                            <input type="number" id="list1-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list1-alignment">Выравнивание</label>
-                                            <select id="list1-alignment">
-                                                <option value="left">По левому краю</option>
-                                                <option value="justify">По ширине</option>
-                                                <option value="center">По центру</option>
-                                                <option value="right">По правому краю</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="list1-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="list1-indent" step="0.1" min="0" max="5" value="1.25">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list1-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="list1-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Списки 2 уровня -->
-                                <div class="form-group">
-                                    <label>Списки 2 уровня</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="list2-font">Шрифт</label>
-                                            <select id="list2-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list2-size">Размер (пт)</label>
-                                            <input type="number" id="list2-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list2-alignment">Выравнивание</label>
-                                            <select id="list2-alignment">
-                                                <option value="left">По левому краю</option>
-                                                <option value="justify">По ширине</option>
-                                                <option value="center">По центру</option>
-                                                <option value="right">По правому краю</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="list2-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="list2-indent" step="0.1" min="0" max="5" value="1.75">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="list2-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="list2-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Подписи к рисункам и таблицам -->
-                            <div class="template-section">
-                                <h3><i class="fas fa-image"></i> Подписи к рисункам и таблицам</h3>
-                                
-                                <div class="form-group">
-                                    <label>Подписи к рисункам</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="figure-font">Шрифт</label>
-                                            <select id="figure-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="figure-size">Размер (пт)</label>
-                                            <input type="number" id="figure-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="figure-alignment">Выравнивание</label>
-                                            <select id="figure-alignment">
-                                                <option value="center">По центру</option>
-                                                <option value="left">По левому краю</option>
-                                                <option value="right">По правому краю</option>
-                                                <option value="justify">По ширине</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="figure-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="figure-indent" step="0.1" min="0" max="5" value="0">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="figure-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="figure-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Подписи к таблицам</label>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="table-font">Шрифт</label>
-                                            <select id="table-font">
-                                                <option value="Times New Roman">Times New Roman</option>
-                                                <option value="Arial">Arial</option>
-                                                <option value="Calibri">Calibri</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="table-size">Размер (пт)</label>
-                                            <input type="number" id="table-size" min="8" max="24" value="14">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="table-alignment">Выравнивание</label>
-                                            <select id="table-alignment">
-                                                <option value="center">По центру</option>
-                                                <option value="left">По левому краю</option>
-                                                <option value="right">По правому краю</option>
-                                                <option value="justify">По ширине</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="table-indent">Отступ первой строки (см)</label>
-                                            <input type="number" id="table-indent" step="0.1" min="0" max="5" value="0">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="table-spacing">Межстрочный интервал</label>
-                                            <input type="number" id="table-spacing" step="0.1" min="1" max="3" value="1.5">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="modal-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Сохранить
-                            </button>
-                            <button type="button" class="btn btn-secondary" id="modal-cancel">
-                                <i class="fas fa-times"></i> Отмена
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+  <div id="app">
+    <nav class="navbar" id="navbar" style="display:none;">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <i class="fas fa-file-check"></i>
+          <span>DocSentri</span>
         </div>
+        <div class="nav-menu" id="nav-menu">
+          <a href="#" class="nav-link" data-page="dashboard"><i class="fas fa-home"></i> Главная</a>
+          <a href="#" class="nav-link" data-page="templates"><i class="fas fa-file-alt"></i> Шаблоны</a>
+          <a href="#" class="nav-link" data-page="upload"><i class="fas fa-upload"></i> Загрузка</a>
+          <a href="#" class="nav-link" data-page="results"><i class="fas fa-list"></i> Результаты</a>
+          <div class="nav-user" id="nav-user">
+            <span id="user-name" style="margin-right:8px;"></span>
+            
+            <button class="btn-logout" id="logout-btn">
+              <i class="fas fa-sign-out-alt"></i> Выход
+            </button>
+          </div>
+        </div>
+        <div class="nav-toggle" id="nav-toggle">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </nav>
 
-        <!-- Уведомления -->
-        <div id="notifications" class="notifications"></div>
+    <main class="main-content">
+      <!-- Login -->
+      <div id="login-page" class="page active">
+        <div class="auth-container">
+          <div class="auth-card">
+            <div class="auth-header">
+              <i class="fas fa-file-check"></i>
+              <h1>Вход в систему</h1>
+              <p>Введите логин и пароль, чтобы продолжить</p>
+            </div>
+            <form id="login-form" class="auth-form">
+              <div class="form-group">
+                <label for="login-username">Логин</label>
+                <input type="text" id="login-username" placeholder="Введите логин" required>
+              </div>
+              <div class="form-group">
+                <label for="login-password">Пароль</label>
+                <input type="password" id="login-password" placeholder="Введите пароль" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-sign-in-alt"></i> Войти
+              </button>
+            </form>
+            <div class="auth-footer">
+              <p>Нет аккаунта? <a href="#" id="show-register">Зарегистрироваться</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register -->
+      <div id="register-page" class="page">
+        <div class="auth-container">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h1>Регистрация</h1>
+              <p>Создайте новую учётную запись</p>
+            </div>
+            <form id="register-form" class="auth-form">
+              <div class="form-group">
+                <label for="register-username">Логин</label>
+                <input type="text" id="register-username" placeholder="Придумайте логин" required>
+              </div>
+              <div class="form-group">
+                <label for="register-password">Пароль</label>
+                <input type="password" id="register-password" placeholder="Придумайте пароль" required>
+              </div>
+              <div class="form-group">
+                <label for="register-confirm">Подтверждение пароля</label>
+                <input type="password" id="register-confirm" placeholder="Повторите пароль" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%">
+                <i class="fas fa-user-plus"></i> Создать аккаунт
+              </button>
+            </form>
+            <div class="auth-footer">
+              <p>Уже есть аккаунт? <a href="#" id="show-login">Войти</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard -->
+      <div id="dashboard-page" class="page">
+        <div class="container">
+          <div class="page-header">
+            <h1><i class="fas fa-home"></i> Главная</h1>
+            <p>Добро пожаловать в DocSentri</p>
+          </div>
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <div class="card-icon"><i class="fas fa-upload"></i></div>
+              <h3>Загрузка документа</h3>
+              <p>Загрузите .docx для проверки соответствия</p>
+              <button class="btn btn-primary" data-nav="upload"><i class="fas fa-upload"></i> Загрузить</button>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-icon"><i class="fas fa-file-alt"></i></div>
+              <h3>Шаблоны</h3>
+              <p>Создавайте и настраивайте правила проверки</p>
+              <button class="btn btn-primary" data-nav="templates"><i class="fas fa-cog"></i> Настроить</button>
+            </div>
+            <div class="dashboard-card">
+              <div class="card-icon"><i class="fas fa-list"></i></div>
+              <h3>Результаты</h3>
+              <p>История проверок и статусы задач</p>
+              <button class="btn btn-primary" data-nav="results"><i class="fas fa-history"></i> Открыть</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Templates -->
+      <div id="templates-page" class="page">
+        <div class="container">
+          <div class="page-header">
+            <h1><i class="fas fa-file-alt"></i> Шаблоны</h1>
+            <button class="btn btn-primary" id="create-template-btn"><i class="fas fa-plus"></i> Создать шаблон</button>
+          </div>
+          <div class="templates-grid" id="templates-grid">
+            <div class="template-card skeleton">
+              <div class="sk-title"></div>
+              <div class="sk-line"></div>
+              <div class="sk-line short"></div>
+              <div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div>
+            </div>
+            <div class="template-card skeleton">
+              <div class="sk-title"></div>
+              <div class="sk-line"></div>
+              <div class="sk-line short"></div>
+              <div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div>
+            </div>
+            <div class="template-card skeleton">
+              <div class="sk-title"></div>
+              <div class="sk-line"></div>
+              <div class="sk-line short"></div>
+              <div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div>
+            </div>
+            <div class="template-card skeleton">
+              <div class="sk-title"></div>
+              <div class="sk-line"></div>
+              <div class="sk-line short"></div>
+              <div class="sk-actions"><div class="sk-btn"></div><div class="sk-btn"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload -->
+      <div id="upload-page" class="page">
+        <div class="container">
+          <div class="page-header">
+            <h1><i class="fas fa-upload"></i> Загрузка документа</h1>
+            <p>Выберите файл .docx для проверки</p>
+          </div>
+          <div class="upload-container">
+            <div class="upload-card">
+              <div class="upload-area" id="upload-area">
+                <h3>Перетащите файл сюда</h3>
+                <p>или</p>
+                <button class="btn btn-secondary" id="select-file-btn"><i class="fas fa-folder-open"></i> Выбрать файл</button>
+                <input type="file" id="file-input" accept=".docx" style="display:none;">
+              </div>
+              <div class="form-group" id="template-selection" style="display:none; margin-top:16px;">
+                <h3>Выбор шаблона</h3>
+                <select id="template-select" class="form-select"></select>
+              </div>
+              <div class="upload-actions" id="upload-actions" style="display:none; margin-top:12px;">
+                <button class="btn btn-primary" id="upload-btn" disabled><i class="fas fa-upload"></i> Отправить на проверку</button>
+                <button class="btn btn-secondary" id="cancel-upload-btn"><i class="fas fa-times"></i> Отмена</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="results-page" class="page">
+        <div class="container">
+          <div class="page-header">
+            <h1><i class="fas fa-list"></i> История проверок</h1>
+            <div class="filter-controls">
+              <select id="status-filter" class="form-select">
+                <option value="">Все статусы</option>
+                <option value="uploaded">Загружено</option>
+                <option value="processing">В обработке</option>
+                <option value="done">Готово</option>
+                <option value="error">Ошибка</option>
+              </select>
+            </div>
+          </div>
+          <div class="results-list" id="results-list"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Template Modal -->
+    <div id="template-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modal-title">Шаблон проверки</h2>
+          <button class="modal-close" id="modal-close" aria-label="Закрыть"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+          <form id="template-form">
+            <div class="form-group">
+              <label for="template-name">Название шаблона</label>
+              <input type="text" id="template-name" placeholder="Например: Отчёт ИВТ" required>
+            </div>
+
+            <div class="template-sections">
+              <!-- Поля страницы -->
+              <div class="template-section">
+                <h3><i class="fas fa-file"></i> Поля страницы (см)</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="top-margin">Верхнее</label>
+                    <input type="number" id="top-margin" step="0.01" min="0" max="10" value="2">
+                  </div>
+                  <div class="form-group">
+                    <label for="bottom-margin">Нижнее</label>
+                    <input type="number" id="bottom-margin" step="0.01" min="0" max="10" value="2">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="left-margin">Левое</label>
+                    <input type="number" id="left-margin" step="0.01" min="0" max="10" value="3">
+                  </div>
+                  <div class="form-group">
+                    <label for="right-margin">Правое</label>
+                    <input type="number" id="right-margin" step="0.01" min="0" max="10" value="1.5">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Заголовки -->
+              <div class="template-section">
+                <h3><i class="fas fa-heading"></i> Заголовки</h3>
+                <div class="form-group">
+                  <label for="start-after-heading">Начинать после заголовка</label>
+                  <input type="text" id="start-after-heading" value="Введение" placeholder="Например: Введение">
+                </div>
+
+                <div class="form-group">
+                  <label>Статический заголовок</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="static-font">Шрифт</label>
+                      <select id="static-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="static-size">Размер (pt)</label>
+                      <input type="number" id="static-size" min="8" max="24" value="14">
+                    </div>
+                    <div class="form-group">
+                      <label for="static-alignment">Выравнивание</label>
+                      <select id="static-alignment">
+                        <option value="center">По центру</option>
+                        <option value="left">По левому краю</option>
+                        <option value="right">По правому краю</option>
+                        <option value="justify">По ширине</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="static-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="static-indent" step="0.01" min="0" max="5" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="static-spacing">Межстрочный интервал</label>
+                      <input type="number" id="static-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Заголовки 1 уровня (1, 2, 3...)</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="h1-font">Шрифт</label>
+                      <select id="h1-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="h1-size">Размер (pt)</label>
+                      <input type="number" id="h1-size" min="8" max="24" value="16">
+                    </div>
+                    <div class="form-group">
+                      <label for="h1-alignment">Выравнивание</label>
+                      <select id="h1-alignment">
+                        <option value="center">По центру</option>
+                        <option value="left">По левому краю</option>
+                        <option value="right">По правому краю</option>
+                        <option value="justify">По ширине</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="h1-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="h1-indent" step="0.01" min="0" max="5" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="h1-spacing">Межстрочный интервал</label>
+                      <input type="number" id="h1-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                    <div class="form-group">
+                      <label><input type="checkbox" id="h1-all-caps"> Все заглавными</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Заголовки 2 уровня (1.1, 1.2, ...)</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="h2-font">Шрифт</label>
+                      <select id="h2-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="h2-size">Размер (pt)</label>
+                      <input type="number" id="h2-size" min="8" max="24" value="14">
+                    </div>
+                    <div class="form-group">
+                      <label for="h2-alignment">Выравнивание</label>
+                      <select id="h2-alignment">
+                        <option value="center">По центру</option>
+                        <option value="left">По левому краю</option>
+                        <option value="right">По правому краю</option>
+                        <option value="justify">По ширине</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="h2-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="h2-indent" step="0.01" min="0" max="5" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="h2-spacing">Межстрочный интервал</label>
+                      <input type="number" id="h2-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                    <div class="form-group">
+                      <label><input type="checkbox" id="h2-all-caps"> Все заглавными</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Заголовки 3 уровня (1.1.1, ...)</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="h3-font">Шрифт</label>
+                      <select id="h3-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="h3-size">Размер (pt)</label>
+                      <input type="number" id="h3-size" min="8" max="24" value="14">
+                    </div>
+                    <div class="form-group">
+                      <label for="h3-alignment">Выравнивание</label>
+                      <select id="h3-alignment">
+                        <option value="center">По центру</option>
+                        <option value="left">По левому краю</option>
+                        <option value="right">По правому краю</option>
+                        <option value="justify">По ширине</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="h3-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="h3-indent" step="0.01" min="0" max="5" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="h3-spacing">Межстрочный интервал</label>
+                      <input type="number" id="h3-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                    <div class="form-group">
+                      <label><input type="checkbox" id="h3-all-caps"> Все заглавными</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Основной текст -->
+              <div class="template-section">
+                <h3><i class="fas fa-paragraph"></i> Основной текст</h3>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="body-font">Шрифт</label>
+                    <select id="body-font">
+                      <option value="Times New Roman">Times New Roman</option>
+                      <option value="Arial">Arial</option>
+                      <option value="Calibri">Calibri</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="body-size">Размер (pt)</label>
+                    <input type="number" id="body-size" min="8" max="24" value="14">
+                  </div>
+                  <div class="form-group">
+                    <label for="body-alignment">Выравнивание</label>
+                    <select id="body-alignment">
+                      <option value="justify">По ширине</option>
+                      <option value="left">По левому краю</option>
+                      <option value="center">По центру</option>
+                      <option value="right">По правому краю</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="body-indent">Отступ первой строки (см)</label>
+                    <input type="number" id="body-indent" step="0.01" min="0" max="5" value="1.25">
+                  </div>
+                  <div class="form-group">
+                    <label for="body-spacing">Межстрочный интервал</label>
+                    <input type="number" id="body-spacing" step="0.01" min="1" max="3" value="1.5">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Списки -->
+              <div class="template-section">
+                <h3><i class="fas fa-list-ul"></i> Списки</h3>
+                <div class="form-group">
+                  <label>Списки 1 уровня</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="list1-font">Шрифт</label>
+                      <select id="list1-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="list1-size">Размер (pt)</label>
+                      <input type="number" id="list1-size" min="8" max="24" value="14">
+                    </div>
+                    <div class="form-group">
+                      <label for="list1-alignment">Выравнивание</label>
+                      <select id="list1-alignment">
+                        <option value="left">По левому краю</option>
+                        <option value="justify">По ширине</option>
+                        <option value="center">По центру</option>
+                        <option value="right">По правому краю</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="list1-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="list1-indent" step="0.01" min="0" max="5" value="1.25">
+                    </div>
+                    <div class="form-group">
+                      <label for="list1-spacing">Межстрочный интервал</label>
+                      <input type="number" id="list1-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Списки 2 уровня</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="list2-font">Шрифт</label>
+                      <select id="list2-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="list2-size">Размер (pt)</label>
+                      <input type="number" id="list2-size" min="8" max="24" value="14">
+                    </div>
+                    <div class="form-group">
+                      <label for="list2-alignment">Выравнивание</label>
+                      <select id="list2-alignment">
+                        <option value="left">По левому краю</option>
+                        <option value="justify">По ширине</option>
+                        <option value="center">По центру</option>
+                        <option value="right">По правому краю</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="list2-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="list2-indent" step="0.01" min="0" max="5" value="1.25">
+                    </div>
+                    <div class="form-group">
+                      <label for="list2-spacing">Межстрочный интервал</label>
+                      <input type="number" id="list2-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Иллюстрации -->
+              <div class="template-section">
+                <h3><i class="fas fa-image"></i> Иллюстрации</h3>
+                <div class="form-group">
+                  <label>Подписи к рисункам</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="figure-font">Шрифт</label>
+                      <select id="figure-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="figure-size">Размер (pt)</label>
+                      <input type="number" id="figure-size" min="8" max="24" value="14">
+                    </div>
+                    <div class="form-group">
+                      <label for="figure-alignment">Выравнивание</label>
+                      <select id="figure-alignment">
+                        <option value="center">По центру</option>
+                        <option value="left">По левому краю</option>
+                        <option value="right">По правому краю</option>
+                        <option value="justify">По ширине</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="figure-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="figure-indent" step="0.01" min="0" max="5" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="figure-spacing">Межстрочный интервал</label>
+                      <input type="number" id="figure-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Подписи к таблицам</label>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="table-font">Шрифт</label>
+                      <select id="table-font">
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Calibri">Calibri</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="table-size">Размер (pt)</label>
+                      <input type="number" id="table-size" min="8" max="24" value="14">
+                    </div>
+                    <div class="form-group">
+                      <label for="table-alignment">Выравнивание</label>
+                      <select id="table-alignment">
+                        <option value="center">По центру</option>
+                        <option value="left">По левому краю</option>
+                        <option value="right">По правому краю</option>
+                        <option value="justify">По ширине</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="table-indent">Отступ первой строки (см)</label>
+                      <input type="number" id="table-indent" step="0.01" min="0" max="5" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="table-spacing">Межстрочный интервал</label>
+                      <input type="number" id="table-spacing" step="0.01" min="1" max="3" value="1.5">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Сохранить</button>
+              <button type="button" class="btn btn-secondary" id="modal-cancel"><i class="fas fa-times"></i> Отмена</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
 
-    <script src="js/app.js?v=9"></script>
+    
+
+    <div id="notifications" class="notifications"></div>
+  </div>
+
+  <script type="module" src="js/main.js?v=2"></script>
 </body>
 </html>
+
+

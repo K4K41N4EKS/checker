@@ -1,0 +1,12 @@
+{
+  "name": "checker-frontend",
+  "private": true,
+  "scripts": {
+    "build:css": "sass --no-source-map --style=compressed scss/main.scss css/app.css",
+    "watch:css": "sass --watch scss/main.scss css/app.css"
+  },
+  "devDependencies": {
+    "sass": "^1.77.0"
+  }
+}
+

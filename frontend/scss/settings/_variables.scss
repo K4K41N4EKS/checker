@@ -24,8 +24,8 @@ $accent-600: #068a39;
     --color-text-muted: #{$text-muted};
     --color-bg: #{$bg};
     --color-surface: #{$surface};
-    --color-surface: #{};
     --field-bg: #ffffff;
+    --color-border-strong: #{$border-strong};
     --color-border: #{$border};
 
     --color-primary: var(--color-accent-500);
@@ -64,16 +64,13 @@ $accent-600: #068a39;
   }
 }
 
-// Light default
-@include theme(':root', $neutral-900, #6a6a6a, $neutral-100, rgba(255,255,255,.9), #dcdfe4, #c7ccd1,
-  #e6f4ea, #2e7d32, #fff3e0, #f57c00, #e6f7ef, #107d46, #ffebee, #c62828);
-
-// Dark
-@include theme(':root[data-theme="dark"]', #f0f0f0, #b5b5b5, $neutral-900, #2a2a2a, #3a3a3a, #444,
+// Single theme (Dark) as default
+@include theme(':root', #f0f0f0, #b5b5b5, $neutral-900, #2a2a2a, #3a3a3a, #444,
   #1f2a22, #7edc8f, #2a241a, #ffb74d, #1c2b21, #7edc8f, #2b1f21, #ef9a9a);
 
-/* Override bg gradient for dark */
-:root[data-theme="dark"] {
+/* Override default inputs/background for the single theme */
+:root {
+  --field-bg: #1f1f1f;
   --bg-gradient: linear-gradient(180deg, #0e301a 0%, #0f5f2a 60%, #0a3d1c 100%),
                   radial-gradient(1200px 800px at 20% 0%, rgba(7,160,64,0.20), transparent 60%),
                   radial-gradient(1200px 800px at 80% 100%, rgba(7,160,64,0.18), transparent 60%);
