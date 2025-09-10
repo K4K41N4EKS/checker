@@ -1,0 +1,14 @@
+/* Results */
+.results-list { display: flex; flex-direction: column; gap: var(--space-4); }
+.result-item { background: var(--color-surface); padding: var(--space-5); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); display: flex; justify-content: space-between; align-items: center; }
+.result-info h3 { color: var(--color-text); margin-bottom: var(--space-2); }
+.result-info p { color: var(--color-text-muted); font-size: .9rem; }
+.result-status { padding: var(--space-2) var(--space-4); border-radius: 20px; font-size: .9rem; font-weight: 500; }
+.status-uploaded { background: var(--status-uploaded-bg); color: var(--status-uploaded-fg); }
+.status-processing { background: var(--status-processing-bg); color: var(--status-processing-fg); }
+.status-done { background: var(--status-done-bg); color: var(--status-done-fg); }
+.status-error { background: var(--status-error-bg); color: var(--status-error-fg); }
+.filter-controls { display: flex; gap: var(--space-4); align-items: center; }
+.filter-controls .form-select { width: 220px; }
+
+
