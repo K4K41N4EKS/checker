@@ -135,12 +135,19 @@ function val(id) {
 function collectFiltersFromForm() {
   const filters = {};
   const startAfter = document.getElementById('start-after-heading')?.value || '';
+  const staticHeadingsRaw = document.getElementById('static-headings')?.value || '';
+  const aiEnabled = !!document.getElementById('ai-integration-enabled')?.checked;
 
   filters.top_margin = Number(val('top-margin'));
   filters.bottom_margin = Number(val('bottom-margin'));
   filters.left_margin = Number(val('left-margin'));
   filters.right_margin = Number(val('right-margin'));
   filters.start_after_heading = startAfter;
+  filters.static_headings = staticHeadingsRaw
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  filters.ai_integration_enabled = aiEnabled;
 
   filters.static_header = {
     font_name: val('static-font'),
@@ -231,6 +238,14 @@ export function populateTemplateForm(template) {
   if (f.left_margin !== undefined) document.getElementById('left-margin').value = f.left_margin;
   if (f.right_margin !== undefined) document.getElementById('right-margin').value = f.right_margin;
   if (f.start_after_heading) document.getElementById('start-after-heading').value = f.start_after_heading;
+  if (Array.isArray(f.static_headings)) {
+    const el = document.getElementById('static-headings');
+    if (el) el.value = f.static_headings.join(', ');
+  }
+  if (f.ai_integration_enabled !== undefined) {
+    const el = document.getElementById('ai-integration-enabled');
+    if (el) el.checked = !!f.ai_integration_enabled;
+  }
 
   if (f.static_header) {
     const s = f.static_header;

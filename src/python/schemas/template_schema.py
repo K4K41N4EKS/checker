@@ -17,6 +17,7 @@ class TemplateResponse(TemplateBase):
     id: str
     user_id: str
     created_at: datetime
+    compiled: dict | None = None
 
     class Config:
         model_config = {

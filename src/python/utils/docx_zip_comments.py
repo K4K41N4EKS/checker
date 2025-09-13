@@ -1,110 +1,186 @@
-import zipfile
-import shutil
 import os
-from lxml import etree
-from tempfile import mkdtemp
-from docx.oxml.ns import qn
+import shutil
+import zipfile
 from datetime import datetime, timezone
+from tempfile import mkdtemp
 
-NAMESPACES = {
-    'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
-}
+from lxml import etree
+from docx.oxml.ns import qn
+
+NAMESPACES = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
+REL = f"{{{REL_NS}}}Relationship"
+
+
+def _next_comment_id(comments_root) -> str:
+    """Return next unique w:id for comments.xml.
+    Uses max existing w:id + 1 to avoid collisions with preexisting comments.
+    """
+    max_id = -1
+    for node in comments_root.xpath("//w:comment", namespaces=NAMESPACES):
+        try:
+            cid = int(node.get(qn("w:id")))
+            if cid > max_id:
+                max_id = cid
+        except Exception:
+            continue
+    return str(max_id + 1 if max_id >= 0 else 0)
+
+
+def _content_children(p):
+    """Return content child nodes of a paragraph (exclude w:pPr)."""
+    return [c for c in p if c.tag != qn("w:pPr")]
+
 
 def add_comments_to_docx_batch(docx_path: str, comments: list[dict], inplace: bool = True) -> str:
-    """
-    Добавляет список комментариев в .docx одним проходом.
-    comments: список словарей {"paragraph_index": int, "error": str}
+    """Batch-insert Word comments for given paragraph indices.
+
+    comments: list of {"paragraph_index": int, "error": str}
+    Returns target .docx path with comments added.
     """
     temp_dir = mkdtemp()
     try:
-        # Распаковка
-        with zipfile.ZipFile(docx_path, 'r') as zip_ref:
+        # Unpack the DOCX
+        with zipfile.ZipFile(docx_path, "r") as zip_ref:
             zip_ref.extractall(temp_dir)
 
-        document_xml = os.path.join(temp_dir, 'word', 'document.xml')
-        comments_xml = os.path.join(temp_dir, 'word', 'comments.xml')
-        rels_xml = os.path.join(temp_dir, 'word', '_rels', 'document.xml.rels')
-        content_types_xml = os.path.join(temp_dir, '[Content_Types].xml')
+        document_xml = os.path.join(temp_dir, "word", "document.xml")
+        comments_xml = os.path.join(temp_dir, "word", "comments.xml")
+        rels_xml = os.path.join(temp_dir, "word", "_rels", "document.xml.rels")
+        content_types_xml = os.path.join(temp_dir, "[Content_Types].xml")
 
+        # Ensure comments.xml exists
         if not os.path.exists(comments_xml):
-            root = etree.Element(qn('w:comments'), nsmap={'w': NAMESPACES['w']})
-            etree.ElementTree(root).write(comments_xml, xml_declaration=True, encoding='UTF-8', standalone='yes')
+            root = etree.Element(qn("w:comments"), nsmap={"w": NAMESPACES["w"]})
+            etree.ElementTree(root).write(
+                comments_xml, xml_declaration=True, encoding="UTF-8", standalone="yes"
+            )
 
-            # Парсинг
+        # Load trees
         doc_tree = etree.parse(document_xml)
         doc_root = doc_tree.getroot()
-        paragraphs = doc_root.xpath('//w:body/w:p', namespaces=NAMESPACES)
+        # include paragraphs inside tables as well
+        paragraphs = doc_root.xpath("//w:body//w:p", namespaces=NAMESPACES)
 
         comments_tree = etree.parse(comments_xml)
         comments_root = comments_tree.getroot()
 
-        # Вставка комментариев
-        for i, item in enumerate(comments):
+        # Pre-compute next comment id once (performance)
+        try:
+            next_id_int = int(_next_comment_id(comments_root))
+        except Exception:
+            next_id_int = 0
+
+        # Insert comments
+        for item in comments:
             idx = item.get("paragraph_index")
             text = item.get("error")
             if idx is None or text is None:
                 continue
-            if idx >= len(paragraphs):
+            if not isinstance(idx, int) or idx < 0 or idx >= len(paragraphs):
                 continue
 
             target_p = paragraphs[idx]
-            runs = target_p.xpath('./w:r', namespaces=NAMESPACES)
-            if not runs:
-                continue
+            # Prefer any paragraph child (excluding w:pPr) as anchor; covers fldSimple/sdt/etc.
+            text_nodes = _content_children(target_p)
 
-            comment_id = str(len(comments_root))
+            # If paragraph has no content children, create a run to anchor the comment
+            if not text_nodes:
+                r = etree.SubElement(target_p, qn("w:r"))
+                etree.SubElement(r, qn("w:t")).text = ""
+                text_nodes = [r]
 
-            comment = etree.Element(qn('w:comment'), {
-                qn('w:author'): 'Checker',
-                qn('w:initials'): 'CHK',
-                qn('w:date'): datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
-                qn('w:id'): comment_id
-            })
-            p = etree.SubElement(comment, qn('w:p'))
-            r = etree.SubElement(p, qn('w:r'))
-            t = etree.SubElement(r, qn('w:t'))
-            t.text = text
+            comment_id = str(next_id_int)
+            next_id_int += 1
+
+            comment = etree.Element(
+                qn("w:comment"),
+                {
+                    qn("w:author"): "Checker",
+                    qn("w:initials"): "CHK",
+                    qn("w:date"): datetime.now(timezone.utc)
+                    .replace(microsecond=0)
+                    .isoformat(),
+                    qn("w:id"): comment_id,
+                },
+            )
+            p = etree.SubElement(comment, qn("w:p"))
+            r = etree.SubElement(p, qn("w:r"))
+            t = etree.SubElement(r, qn("w:t"))
+            t.text = str(text)
             comments_root.append(comment)
 
-            comment_start = etree.Element(qn('w:commentRangeStart'), {qn('w:id'): comment_id})
-            comment_end = etree.Element(qn('w:commentRangeEnd'), {qn('w:id'): comment_id})
-            comment_ref = etree.Element(qn('w:r'))
-            etree.SubElement(comment_ref, qn('w:commentReference'), {qn('w:id'): comment_id})
+            comment_start = etree.Element(qn("w:commentRangeStart"), {qn("w:id"): comment_id})
+            comment_end = etree.Element(qn("w:commentRangeEnd"), {qn("w:id"): comment_id})
+            comment_ref = etree.Element(qn("w:r"))
+            etree.SubElement(comment_ref, qn("w:commentReference"), {qn("w:id"): comment_id})
 
-            runs[0].addprevious(comment_start)
-            runs[-1].addnext(comment_end)
+            # Insert so that start/end are siblings of top-level text nodes of the paragraph,
+            # not inside wrappers like w:hyperlink (Word expects them directly under w:p)
+            first_text_node = text_nodes[0]
+            last_text_node = text_nodes[-1]
+            first_text_node.addprevious(comment_start)
+            last_text_node.addnext(comment_end)
             comment_end.addnext(comment_ref)
 
-        # Сохранение изменений
-        doc_tree.write(document_xml, xml_declaration=True, encoding='UTF-8', standalone='yes')
-        comments_tree.write(comments_xml, xml_declaration=True, encoding='UTF-8', standalone='yes')
+        # Persist XML updates
+        doc_tree.write(document_xml, xml_declaration=True, encoding="UTF-8", standalone="yes")
+        comments_tree.write(comments_xml, xml_declaration=True, encoding="UTF-8", standalone="yes")
 
-        # Обновление rels
+        # Ensure relationship to comments exists
         if os.path.exists(rels_xml):
             rels_tree = etree.parse(rels_xml)
             rels_root = rels_tree.getroot()
-            if not any(rel.get('Type') == 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments' for rel in rels_root):
-                rel_id = f"rId{len(rels_root) + 1}"
-                etree.SubElement(rels_root, 'Relationship', {
-                    'Id': rel_id,
-                    'Type': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments',
-                    'Target': 'comments.xml'
-                })
-                rels_tree.write(rels_xml, xml_declaration=True, encoding='UTF-8', standalone='yes')
+            rel_type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments"
+            # Check existing relationships with correct namespace
+            has_rel = any(
+                (el.tag == REL and el.get("Type") == rel_type and el.get("Target") == "comments.xml")
+                for el in rels_root
+            )
+            if not has_rel:
+                # Compute next rId as max existing numeric suffix + 1
+                import re
 
-        # Обновление content types
+                ids = [el.get("Id", "") for el in rels_root if el.tag == REL]
+                nums = []
+                for i in ids:
+                    m = re.match(r"rId(\d+)$", i)
+                    if m:
+                        try:
+                            nums.append(int(m.group(1)))
+                        except Exception:
+                            pass
+                next_num = (max(nums) + 1) if nums else 1
+                rel_id = f"rId{next_num}"
+                etree.SubElement(
+                    rels_root,
+                    REL,
+                    {"Id": rel_id, "Type": rel_type, "Target": "comments.xml"},
+                )
+                rels_tree.write(rels_xml, xml_declaration=True, encoding="UTF-8", standalone="yes")
+
+        # Ensure content type mapping exists
         ct_tree = etree.parse(content_types_xml)
         ct_root = ct_tree.getroot()
-        if not any(el.tag.endswith('Override') and el.attrib.get('PartName') == '/word/comments.xml' for el in ct_root):
-            etree.SubElement(ct_root, 'Override', {
-                'PartName': '/word/comments.xml',
-                'ContentType': 'application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml'
-            })
-            ct_tree.write(content_types_xml, xml_declaration=True, encoding='UTF-8', standalone='yes')
+        override_tag = "{http://schemas.openxmlformats.org/package/2006/content-types}Override"
+        has_override = any(
+            el.tag == override_tag and el.attrib.get("PartName") == "/word/comments.xml" for el in ct_root
+        )
+        if not has_override:
+            etree.SubElement(
+                ct_root,
+                "{http://schemas.openxmlformats.org/package/2006/content-types}Override",
+                {
+                    "PartName": "/word/comments.xml",
+                    "ContentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml",
+                },
+            )
+            ct_tree.write(content_types_xml, xml_declaration=True, encoding="UTF-8", standalone="yes")
 
-        # Перезапись .docx
-        target_path = docx_path if inplace else docx_path.replace('.docx', '_with_comment.docx')
-        with zipfile.ZipFile(target_path, 'w') as new_zip:
+        # Repack DOCX
+        base, ext = os.path.splitext(docx_path)
+        target_path = docx_path if inplace else f"{base}_with_comment{ext}"
+        with zipfile.ZipFile(target_path, "w", compression=zipfile.ZIP_DEFLATED) as new_zip:
             for foldername, _, filenames in os.walk(temp_dir):
                 for filename in filenames:
                     filepath = os.path.join(foldername, filename)
