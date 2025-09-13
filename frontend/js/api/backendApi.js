@@ -66,3 +66,9 @@ export async function downloadFileBlob(operationId) {
   if (!response.ok) throw new Error('Download failed');
   return response.blob();
 }
+
+export async function fetchOperationErrors(operationId) {
+  const response = await apiFetch(`${API_BASE}/files/errors/${operationId}`);
+  if (!response.ok) throw new Error('Failed to fetch errors');
+  return response.json();
+}

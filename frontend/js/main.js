@@ -4,6 +4,7 @@ import { attachAuthHandlers } from './features/auth.js';
 import { attachTemplateHandlers, loadTemplates, editTemplate, deleteTemplate } from './features/templates.js';
 import { setupFileUpload } from './features/upload.js';
 import { loadResults, attachResultsHandlers, downloadFile as downloadResultFile, highlightOperation } from './features/results.js';
+import { initResultsReport } from './features/results_report.js';
 import { loadDashboard } from './features/dashboard.js';
 import { downloadFileBlob } from './api/backendApi.js';
 
@@ -84,6 +85,7 @@ async function bootstrap() {
   attachTemplateHandlers();
   setupFileUpload();
   attachResultsHandlers();
+  initResultsReport();
   bindGlobals();
   tuneNumericInputsPrecision();
 }
@@ -98,4 +100,3 @@ if (document.readyState === 'loading') {
 window.addEventListener('app:unauthorized', () => {
   try { showLoginPage(); } catch (_) {}
 });
-
